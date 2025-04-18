@@ -1,0 +1,45 @@
+.libraryContainer {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 100px 1fr 100px;
+}
+
+.libraryHeader {
+  background-color: #00255f;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  color: #fff;
+}
+
+.libraryHeader h1 {
+  font-size: 1.6rem;
+  flex: 1;
+}
+
+.filterDiv {
+  display: flex;
+  gap: 1rem;
+}
+.libraryMain {
+  padding: 0.4rem 1rem;
+  display: grid;
+  grid-template-rows: 30px 1fr 50px;
+  row-gap: 1rem;
+}
+
+.manhwaSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.libraryFooter {
+  padding: 1rem;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+}

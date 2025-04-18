@@ -1,0 +1,110 @@
+.popupHeader {
+  background-color: #00255f;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.popupHeader h1 {
+  font-size: 1.2rem;
+  flex: 1;
+  margin: 0;
+  color: #fff;
+}
+
+.popupHeader a button,
+.buttonBox button {
+  font-size: 1rem;
+  background-color: #fff;
+  color: #00255f;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 150px;
+}
+
+.buttonBox button {
+  background-color: #00255f;
+  color: #fff;
+  max-width: 100px;
+}
+
+.popupHeader a button:hover {
+  background-color: #e0e0e0;
+}
+
+#popupForm {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#popupForm .inputBox {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 5rem;
+}
+#popupForm .inputBox input {
+  width: 100%;
+  max-width: 500px;
+  justify-self: start;
+  padding: 4px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+#popupForm .inputBox input[id="chapter"] {
+  max-width: 100px;
+}
+#popupForm .inputBox input:focus,
+.textAreaBox textarea:focus {
+  outline: none;
+  border-color: #00255f;
+}
+
+.textAreaBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.textAreaBox textarea {
+  width: 100%;
+  padding: 8px;
+  max-width: 100%;
+  max-height: 10rem;
+  border-radius: 3px;
+  resize: vertical;
+}
+#popupForm label {
+  font-size: 1.2rem;
+  color: #00255f;
+}
+
+.optional {
+  font-size: 0.8rem;
+  color: #515151;
+}
+
+.popupHeader a button:hover {
+  background-color: #e0e0e0;
+}
+
+@media (max-width: 320px) {
+  .popupHeader h1 {
+    font-size: 1rem;
+  }
+
+  #popupForm label {
+    font-size: 0.9rem;
+  }
+
+  .popupHeader a button,
+  .buttonBox button {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+}
