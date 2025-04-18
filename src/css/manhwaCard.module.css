@@ -1,0 +1,104 @@
+.manhwaCard {
+  width: 100%;
+  max-width: 350px;
+  box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+}
+.cardHeader .comicTitle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cardHeader .comicTitle img {
+  width: 100%;
+  max-width: 200px;
+  height: 200px;
+  cursor: pointer;
+}
+
+.cardHeader .siteTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+.cardHeader .siteTitle img {
+  width: 1.5em;
+  height: 1.5em;
+  object-fit: contain;
+  max-width: 32px;
+  max-height: 32px;
+  cursor: pointer;
+}
+.cardHeader .isActive,
+.cardHeader .isNotActive,
+.completed,
+.dropped,
+.hiatus,
+.onGoing {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.cardHeader .isActive {
+  background-color: rgb(3, 212, 3);
+}
+
+.cardHeader .isNotActive {
+  background-color: red;
+}
+
+.cardBody {
+  padding: 1em;
+}
+.cardBody .chaptersBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 13px;
+}
+
+.cardBody .genreBox {
+  display: flex;
+  gap: 0.3em;
+  text-align: justify;
+}
+
+.iconsBox {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.iconBtn:hover {
+  transform: scale(1.1);
+}
+
+.completed {
+  background-color: green;
+}
+
+.dropped {
+  background-color: red;
+}
+
+.hiatus {
+  background-color: yellow;
+}
+
+.onGoing {
+  background-color: greenyellow;
+}
