@@ -25,5 +25,5 @@
 
   "web_accessible_resources": ["library.html"],
 
-  "permissions": ["storage", "tabs", "<all_urls>"]
+  "permissions": ["activeTab", "tabs"]
 }
