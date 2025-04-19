@@ -73,8 +73,8 @@
 }
 .textAreaBox textarea {
   width: 100%;
+  max-width: 500px;
   padding: 8px;
-  max-width: 100%;
   max-height: 10rem;
   border-radius: 3px;
   resize: vertical;
@@ -93,6 +93,21 @@
   background-color: #e0e0e0;
 }
 
+.select {
+  max-width: 100px;
+  padding: 0.3rem;
+  margin-left: 0.25rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.select:focus {
+  border-color: #5a67d8;
+  outline: none;
+}
 @media (max-width: 320px) {
   .popupHeader h1 {
     font-size: 1rem;

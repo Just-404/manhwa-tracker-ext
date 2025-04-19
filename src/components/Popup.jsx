@@ -1,4 +1,5 @@
 import styles from "../css/popup.module.css";
+import ManhwaStatus from "../js/utils/enums";
 
 const Popup = () => {
   return (
@@ -19,7 +20,7 @@ const Popup = () => {
           <input type="text" id="title" name="title" required />
         </div>
         <div className={styles.inputBox}>
-          <label for="chapter">Chapter: </label>
+          <label for="chapter">Chapters: </label>
           <input
             type="number"
             id="chapter"
@@ -28,6 +29,18 @@ const Popup = () => {
             step="1"
             required
           />
+        </div>
+        <div className={styles.inputBox}>
+          <label className={styles.label} htmlFor="status">
+            Status:{" "}
+          </label>
+          <select id="status" className={styles.select} name="status">
+            {Object.values(ManhwaStatus).map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
         </div>
         <div className={styles.textAreaBox}>
           <label for="comment">
