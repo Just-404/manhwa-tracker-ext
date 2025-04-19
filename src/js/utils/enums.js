@@ -1,8 +1,9 @@
 const ManhwaStatus = Object.freeze({
-  COMPLETED: "Completed",
-  HIATUS: "Hiatus",
-  ONGOING: "On Going",
-  DROPPED: "Dropped",
+  FINISHED: "FINISHED",
+  HIATUS: "HIATUS",
+  RELEASING: "RELEASING",
+  CANCELLED: "CANCELLED",
+  UNKNOWN: "UNKNOWN",
 });
 
 export default ManhwaStatus;
