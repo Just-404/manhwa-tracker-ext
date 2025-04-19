@@ -2,6 +2,7 @@
   width: 100%;
   max-width: 350px;
   box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+  padding-bottom: 1em;
 }
 .cardHeader .comicTitle {
   display: flex;
@@ -66,6 +67,9 @@
   text-align: justify;
 }
 
+.genreP {
+  height: max-content;
+}
 .iconsBox {
   display: flex;
   justify-content: space-around;

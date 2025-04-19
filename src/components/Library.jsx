@@ -6,22 +6,24 @@ const Library = () => {
   // The initial state is for testing purpose
   const [comics, setComics] = useState([
     {
-      manhwa: { id: 0, title: "testing" },
+      manhwa: { idManhwa: 0, title: "testing" },
       site: { id: 0, name: "site1", isActive: true },
     },
     {
       manhwa: {
-        id: 1,
+        idManhwa: 1,
         title: "testing",
         chapters: "65",
         status: "Completed",
         lastReadChapter: "34",
         lastTimeRead: "Wed Oct 05 2011 16:48:00 GMT+0200 (CEST)",
+        genre: ["Shonen", "slice of life", "dungeon"],
+        note: "This is another comment.",
       },
       site: {
         id: 0,
         name: "Asurascans",
-        isActive: true,
+        isActive: false,
         baseUrl: "https://asuracomic.net/",
         language: "en",
       },
