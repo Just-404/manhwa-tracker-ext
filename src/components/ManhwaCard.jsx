@@ -69,7 +69,7 @@ const ManhwaCard = ({ manhwa, site }) => {
             <p>
               <b>Genres: </b>
             </p>
-            <p className={styles.genreP}>{manhwa.genre?.join(", ")}</p>
+            <p className={styles.genreP}>{manhwa.genre}</p>
           </div>
 
           <div>

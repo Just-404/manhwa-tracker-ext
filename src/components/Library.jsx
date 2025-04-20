@@ -1,73 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ToastContainer } from "react-toastify";
 import styles from "../css/library.module.css";
 import ComicsContainer from "./ComicsContainer";
+import { useDexie } from "../db/useDexie";
+import addToastMessage from "../js/utils/toastify";
+
 const Library = () => {
-  // The initial state is for testing purpose
-  const [comics, setComics] = useState([
-    {
-      manhwa: { idManhwa: 0, title: "testing" },
-      site: { id: 0, name: "site1", isActive: true },
-    },
-    {
-      manhwa: {
-        idManhwa: 1,
-        title: "testing",
-        chapters: "65",
-        status: "Completed",
-        lastReadChapter: "34",
-        lastTimeRead: "Wed Oct 05 2011 16:48:00 GMT+0200 (CEST)",
-        genre: ["Shonen", "slice of life", "dungeon"],
-        note: "This is another comment.",
-      },
-      site: {
-        id: 0,
-        name: "Asurascans",
-        isActive: false,
-        baseUrl: "https://asuracomic.net/",
-        language: "en",
-      },
-    },
-    {
-      manhwa: { idManhwa: 2, title: "testing" },
-      site: { id: 0, name: "site1" },
-    },
-    {
-      manhwa: { idManhwa: 3, title: "testing" },
-      site: { id: 0, name: "site1" },
-    },
-    {
-      manhwa: { idManhwa: 4, title: "testing" },
-      site: { id: 0, name: "site1" },
-    },
-    {
-      manhwa: { idManhwa: 5, title: "testing" },
-      site: { id: 0, name: "site1" },
-    },
-    {
-      manhwa: { idManhwa: 6, title: "testing" },
-      site: { id: 0, name: "site1" },
-    },
-    {
-      manhwa: { idManhwa: 7, title: "testing" },
-      site: { id: 0, name: "site1" },
-    },
-    {
-      manhwa: { idManhwa: 8, title: "testing" },
-      site: { id: 0, name: "site1" },
-    },
-    {
-      manhwa: { idManhwa: 9, title: "testing" },
-      site: { id: 0, name: "site1" },
-    },
-    {
-      manhwa: { idManhwa: 10, title: "testing" },
-      site: { id: 0, name: "site1" },
-    },
-  ]);
+  const { getManhwas } = useDexie();
+  const [comics, setComics] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const fetchManhwas = useCallback(
+    async (page = 1, limit = 20, sortBy = "title") => {
+      try {
+        const { manhwasAndSite, total } = await getManhwas(page, limit, sortBy);
+        setComics(manhwasAndSite);
+        setPageCount(Math.ceil(total / limit));
+        console.log(manhwasAndSite);
+      } catch (error) {
+        addToastMessage("error", "Error getting manhwas!");
+        console.log("Error getting data", error);
+      }
+    },
+    [getManhwas]
+  );
+  useEffect(() => {
+    fetchManhwas();
+  }, [currentPage, fetchManhwas]);
   return (
     <>
       {" "}
