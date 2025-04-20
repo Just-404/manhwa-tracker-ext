@@ -3,7 +3,6 @@ const runtime = browser.runtime || chrome.runtime;
 runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "fetchComicData") {
     const cleanedTitle = msg.title;
-    console.log(cleanedTitle);
 
     fetch("https://graphql.anilist.co", {
       method: "POST",

@@ -1,4 +1,4 @@
-import cleanTitle from "./utils/cleanTitle";
+import { cleanTitle, extractChapterFromUrl } from "./utils/utils";
 
 const runtime = browser.runtime || chrome.runtime;
 
@@ -22,9 +22,9 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
         title: cleanedTitle,
         chapters: null,
         currentChapterUrl: window.location.href,
-        lastReadChapter: null,
+        lastReadChapter: extractChapterFromUrl(window.location.href),
         isFavorite: false,
-        status: "On Going",
+        status: null,
         lastTimeRead: new Date().toISOString(),
         imgUrl: null,
         genre: null,

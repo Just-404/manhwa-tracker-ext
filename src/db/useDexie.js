@@ -2,31 +2,58 @@ import { useDb } from "./DbContext";
 
 export const useDexie = () => {
   const db = useDb();
-  const addManhwaWithSite = async (siteData, manhwaData) => {
-    return await db.transaction("rw", db.manhwa, db.site, async () => {
-      let siteId;
 
-      const existingSite = await db.site
-        .where("baseUrl")
-        .equals(siteData.baseUrl)
-        .first();
+  const addManhwaWithSite = async (siteData, manhwaData, confirmUpdateCb) => {
+    let siteId;
+    // if the site doesn't exists, the it is created
+    const existingSite = await db.site
+      .where("baseUrl")
+      .equals(siteData.baseUrl)
+      .first();
 
-      if (existingSite) {
-        siteId = existingSite.idSite;
-      } else {
-        siteId = await db.site.add({
-          ...siteData,
-          isActive: true,
-          lastChecked: new Date().toISOString(),
-        });
-      }
-
-      return await db.manhwa.add({
-        ...manhwaData,
-        idSite: siteId,
-        lastTimeRead: new Date().toISOString(),
+    if (existingSite) {
+      siteId = existingSite.idSite;
+    } else {
+      siteId = await db.site.add({
+        ...siteData,
+        isActive: true,
+        lastChecked: new Date().toISOString(),
       });
+    }
+
+    // If the manhwa exists in the same site, it asks the user to update last read ch
+    const existingManhwaOnSite = await db.manhwa
+      .where("[title+idSite]")
+      .equals([manhwaData.title, siteId])
+      .first();
+
+    if (existingManhwaOnSite) {
+      const confirmation = await confirmUpdateCb(
+        existingManhwaOnSite,
+        manhwaData.lastReadChapter
+      );
+
+      if (confirmation) {
+        await db.transaction("rw", db.manhwa, db.site, async () => {
+          await db.manhwa.update(existingManhwaOnSite.idManhwa, {
+            ...existingManhwaOnSite,
+            lastReadChapter: manhwaData.lastReadChapter,
+            lastTimeRead: new Date().toISOString(),
+          });
+        });
+        return { updated: true, id: existingManhwaOnSite.idManhwa };
+      } else {
+        return { skipped: true };
+      }
+    }
+
+    const newId = await db.manhwa.add({
+      ...manhwaData,
+      idSite: siteId,
+      lastTimeRead: new Date().toISOString(),
     });
+
+    return { added: true, id: newId };
   };
 
   const getManhwas = async (page = 1, pageSize = 20) => {

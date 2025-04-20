@@ -7,7 +7,7 @@ console.log("Dexie DB initialized");
 db.version(1).stores({
   site: "++idSite, name, baseUrl, isActive, language, lastChecked, imgUrl",
   manhwa:
-    "++idManhwa, title, chapters, currentChapterUrl, lastReadChapter, isFavorite, status, lastTimeRead, imgUrl, idSite, genre, note",
+    "++idManhwa, &[title+idSite], title, chapters, currentChapterUrl, lastReadChapter, isFavorite, status, lastTimeRead, imgUrl, idSite, genre, note",
 });
 
 const DbContext = createContext(null);

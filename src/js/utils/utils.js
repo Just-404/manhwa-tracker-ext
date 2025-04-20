@@ -12,4 +12,11 @@ const cleanTitle = (title) => {
     .trim();
 };
 
-export default cleanTitle;
+const extractChapterFromUrl = (url) => {
+  const lUrl = url.toLowerCase();
+  const match = lUrl.match(/\/chapter[-/](\d+(\.\d+)?)/);
+
+  return match ? parseFloat(match[1]) : null;
+};
+
+export { cleanTitle, extractChapterFromUrl };

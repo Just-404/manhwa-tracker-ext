@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { ToastContainer } from "react-toastify";
 import styles from "../css/library.module.css";
 import ComicsContainer from "./ComicsContainer";
-
 const Library = () => {
   // The initial state is for testing purpose
   const [comics, setComics] = useState([
@@ -69,36 +69,51 @@ const Library = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   return (
-    <div className={styles.libraryContainer}>
-      <header className={styles.libraryHeader}>
-        <h1>My library</h1>
-        <div className="searchSection">
-          <input type="search" />
-          <button className="searchButton">Search</button>
-        </div>
-      </header>
+    <>
+      {" "}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <div className={styles.libraryContainer}>
+        <header className={styles.libraryHeader}>
+          <h1>My library</h1>
+          <div className="searchSection">
+            <input type="search" />
+            <button className="searchButton">Search</button>
+          </div>
+        </header>
 
-      <main className={styles.libraryMain}>
-        <div className={styles.filterDiv}>
-          <h2>Sort by:</h2>
-          <select id="sortBy" name="sortBy">
-            <option value="site">Site</option>
-            <option value="title">Title</option>
-            <option value="chapter">Chapter</option>
-          </select>
-        </div>
-        {
-          <ComicsContainer
-            data={comics}
-            onPageCount={setPageCount}
-            pageCount={pageCount}
-          />
-        }
-      </main>
-      <footer className={styles.libraryFooter}>
-        <p>Created by: Just-404</p>
-      </footer>
-    </div>
+        <main className={styles.libraryMain}>
+          <div className={styles.filterDiv}>
+            <h2>Sort by:</h2>
+            <select id="sortBy" name="sortBy">
+              <option value="site">Site</option>
+              <option value="title">Title</option>
+              <option value="chapter">Chapter</option>
+            </select>
+          </div>
+          {
+            <ComicsContainer
+              data={comics}
+              onPageCount={setPageCount}
+              pageCount={pageCount}
+            />
+          }
+        </main>
+        <footer className={styles.libraryFooter}>
+          <p>Created by: Just-404</p>
+        </footer>
+      </div>
+    </>
   );
 };
 

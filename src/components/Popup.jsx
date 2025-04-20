@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
+import addToastMessage from "../js/utils/toastify";
+import confirmModal from "../components/ConfirmModal";
 import styles from "../css/popup.module.css";
 import ManhwaStatus from "../js/utils/enums";
 import { useDexie } from "../db/useDexie";
+
 const Popup = () => {
   const [site, setSite] = useState({});
   const [manhwa, setManhwa] = useState({});
+  const { addManhwaWithSite } = useDexie();
 
   useEffect(() => {
     chrome.tabs?.query({ active: true, currentWindow: true }, (tabs) => {
@@ -24,6 +29,7 @@ const Popup = () => {
       }
     });
   }, []);
+
   const handleManhwaInputChange = (e) => {
     const { name, value } = e.target;
     setManhwa((prev) => ({
@@ -31,15 +37,50 @@ const Popup = () => {
       [name]: value,
     }));
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const result = await addManhwaWithSite(
+        site,
+        manhwa,
+        async (existing, currentCh) => {
+          return await confirmModal(
+            `You already saved "${existing.title}" on this site. Last read chapter [${existing.lastReadChapter}]. Update it to [${currentCh}]?`
+          );
+        }
+      );
+
+      if (result.added) addToastMessage("success", "Manhwa saved!");
+      if (result.updated)
+        addToastMessage("success", "Last read chapter updated!");
+      if (result.skipped) addToastMessage("warning", "Skipped update.");
+    } catch (error) {
+      alert("Error saving");
+      console.log("Error saving data!", error);
+    }
+  };
   return (
     <>
-      <div class={styles.popupHeader}>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <div className={styles.popupHeader}>
         <h1>Information</h1>
         <a href="library.html" target="_blank" rel="noopener noreferrer">
           <button>Go to library</button>
         </a>
       </div>
-      <form action="#" id={styles.popupForm}>
+      <form action="#" id={styles.popupForm} onSubmit={handleSubmit}>
         <div className={styles.inputBox}>
           <label htmlFor="site">Site: </label>
           <input
@@ -76,7 +117,7 @@ const Popup = () => {
           />
         </div>
         <div className={styles.inputBox}>
-          <label for="lastChapter">Last read chapter: </label>
+          <label htmlFor="lastChapter">Current chapter: </label>
           <input
             type="number"
             id="lastChapter"
@@ -107,13 +148,13 @@ const Popup = () => {
           </select>
         </div>
         <div className={styles.textAreaBox}>
-          <label for="note">
-            Note: <span class={styles.optional}>(optional)</span>
+          <label htmlFor="note">
+            Note: <span className={styles.optional}>(optional)</span>
           </label>
           <textarea
             name="note"
             id="note"
-            maxlength="250"
+            maxLength="250"
             value={manhwa.note}
             onChange={handleManhwaInputChange}
           ></textarea>
