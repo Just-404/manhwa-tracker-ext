@@ -58,21 +58,33 @@ export const useDexie = () => {
       return { added: true, id: newId };
     };
 
-    const getManhwas = async (page = 1, pageSize = 20, sortBy = "title") => {
+    const getManhwas = async (page = 1, pageSize = 20, sortBy) => {
       const offset = (page - 1) * pageSize;
       if (!db || !db.manhwa) {
         console.error("Database or manhwa table not initialized", db);
         return { manhwasAndSite: [], total: 0 };
       }
 
-      const count = await db.manhwa.count();
+      let manhwas, count;
 
-      const manhwas = await db.manhwa
-        .orderBy(sortBy)
-        .offset(offset)
-        .limit(pageSize)
-        .toArray();
+      if (sortBy) {
+        manhwas = await db.manhwa
+          .where("[status+title]")
+          .between([sortBy, ""], [sortBy, "\uffff"])
+          .offset(offset)
+          .limit(pageSize)
+          .toArray();
 
+        count = await db.manhwa.where("status").equals(sortBy).count();
+      } else {
+        manhwas = await db.manhwa
+          .orderBy("title")
+          .offset(offset)
+          .limit(pageSize)
+          .toArray();
+
+        count = await db.manhwa.count();
+      }
       const manhwasAndSite = await Promise.all(
         manhwas.map(async (manhwa) => {
           const site = await db.site.get(manhwa.idSite);
@@ -80,6 +92,35 @@ export const useDexie = () => {
         })
       );
       return { manhwasAndSite, total: count };
+    };
+
+    const searchByName = async (name, page = 1, pageSize = 20) => {
+      if (name === "") {
+        throw new Error("The search term is empty");
+      }
+      const loweredName = name.toLowerCase();
+
+      const allManhwas = await db.manhwa.orderBy("title").toArray();
+      const matchedManhwas = allManhwas.filter((m) =>
+        m.title.toLowerCase().includes(loweredName)
+      );
+
+      const total = matchedManhwas.length;
+      if (total === 0) {
+        return { manhwasAndSite: [], total: 0 };
+      }
+
+      const start = (page - 1) * pageSize;
+      const paginatedManhwas = matchedManhwas.slice(start, start + pageSize);
+
+      const manhwasAndSite = await Promise.all(
+        paginatedManhwas.map(async (manhwa) => {
+          const site = await db.site.get(manhwa.idSite);
+          return { manhwa, site };
+        })
+      );
+
+      return { manhwasAndSite, total };
     };
 
     const updateMahwa = async (id, newManhwaInfo) => {
@@ -144,6 +185,7 @@ export const useDexie = () => {
     return {
       addManhwaWithSite,
       getManhwas,
+      searchByName,
       updateMahwa,
       updateFavorite,
       updateSite,

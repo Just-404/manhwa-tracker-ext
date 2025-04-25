@@ -4,18 +4,26 @@
   box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
   padding-bottom: 1em;
 }
+.cardHeader {
+  width: 100%;
+}
 .cardHeader .comicTitle {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.5em;
 }
 .cardHeader .comicTitle img {
   width: 100%;
-  max-width: 200px;
-  height: 200px;
+  height: auto;
   cursor: pointer;
+  object-fit: cover;
 }
 
+.cardHeader h3 {
+  padding: 0 1em;
+  text-align: center;
+}
 .cardHeader .siteTitle {
   display: flex;
   align-items: center;

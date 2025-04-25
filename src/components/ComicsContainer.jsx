@@ -44,7 +44,7 @@ const ComicsSection = ({
         pageLinkClassName="page-num"
         previousLinkClassName="page-num"
         nextLinkClassName="page-num"
-        activeLinkClassName="active-link"
+        activeLinkClassName={styles.activeLink}
       />
     </>
   );

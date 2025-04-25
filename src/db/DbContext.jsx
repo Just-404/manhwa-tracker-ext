@@ -2,12 +2,11 @@ import React, { createContext, useContext } from "react";
 import Dexie from "dexie";
 
 const db = new Dexie("ManhwaDB");
-console.log("Dexie DB initialized");
 
 db.version(1).stores({
   site: "++idSite, name, baseUrl, isActive, language, lastChecked, imgUrl",
   manhwa:
-    "++idManhwa, &[title+idSite], title, chapters, currentChapterUrl, lastReadChapter, isFavorite, status, lastTimeRead, imgUrl, idSite, genre, note",
+    "++idManhwa, &[title+idSite], title, chapters, currentChapterUrl, lastReadChapter, isFavorite, status, lastTimeRead, imgUrl, idSite, genre, note, [status+title]",
 });
 
 const DbContext = createContext(null);

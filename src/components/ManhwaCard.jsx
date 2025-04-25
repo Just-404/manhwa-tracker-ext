@@ -30,14 +30,18 @@ const ManhwaCard = ({
       <div className={styles.manhwaCard}>
         <div className={styles.cardHeader}>
           <div className={styles.comicTitle}>
-            <a href={null}>
+            <a
+              href={manhwa.currentChapterUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <img
-                src={"../../icons/icon48.png"}
+                src={manhwa.imgUrl ?? "../../icons/icon48.png"}
                 alt={`${manhwa.title} front page`}
               />
             </a>
             <h3>
-              Title: <em>{manhwa.title}</em>
+              <em>{manhwa.title}</em>
             </h3>
           </div>
 
