@@ -2,7 +2,14 @@ import { useRef, useEffect, useState } from "react";
 import styles from "../css/editModal.module.css";
 import ManhwaStatus from "../js/utils/enums";
 
-const EditModal = ({ isModalOpen, onClose, onSave, manhwa, site }) => {
+const EditModal = ({
+  isModalOpen,
+  onClose,
+  manhwa,
+  site,
+  onEditSite,
+  onEditManhwa,
+}) => {
   const dialogRef = useRef(null);
   const [editedManhwa, setEditedManhwa] = useState({ ...manhwa });
   const [editedSite, setEditedSite] = useState({ ...site });
@@ -31,12 +38,33 @@ const EditModal = ({ isModalOpen, onClose, onSave, manhwa, site }) => {
       [name]: parsedValue,
     }));
   };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const result = confirm("Are you sure that you want to change this?");
+  const [confirmingManhwa, setConfirmingManhwa] = useState(false);
+  const [confirmingSite, setConfirmingSite] = useState(false);
 
-    if (!result) return;
-    onSave({ ...editedManhwa, ...editedSite });
+  const handleManhwaSubmit = (e) => {
+    e.preventDefault();
+    setConfirmingManhwa(true);
+  };
+
+  const handleSiteSubmit = (e) => {
+    e.preventDefault();
+    setConfirmingSite(true);
+  };
+
+  const confirmManhwa = (confirmed) => {
+    setConfirmingManhwa(false);
+    if (!confirmed) return;
+
+    onEditManhwa(manhwa.idManhwa, editedManhwa);
+    handleClose();
+  };
+
+  const confirmSite = (confirmed) => {
+    setConfirmingSite(false);
+    if (!confirmed) return;
+
+    onEditSite(site.idSite, editedSite);
+    handleClose();
   };
 
   const handleClose = () => {
@@ -47,13 +75,13 @@ const EditModal = ({ isModalOpen, onClose, onSave, manhwa, site }) => {
 
   return (
     <dialog ref={dialogRef} className={styles.editModal}>
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <form onSubmit={handleSiteSubmit} className={styles.form}>
         <div className={styles.siteContainer}>
           <div>
             <h2>Edit Site</h2>
             <p>
               {" "}
-              <strong>Important:</strong> Changing site info will change for
+              <strong>Important:</strong> Changing site info will change it for
               every comic!
             </p>
           </div>
@@ -91,7 +119,26 @@ const EditModal = ({ isModalOpen, onClose, onSave, manhwa, site }) => {
             </select>
           </label>
         </div>
+        {confirmingSite ? (
+          <div className={styles.confirmBox}>
+            <p>Are you sure you want to change the site info?</p>
+            <button type="button" onClick={() => confirmSite(true)}>
+              Yes
+            </button>
+            <button type="button" onClick={() => confirmSite(false)}>
+              No
+            </button>
+          </div>
+        ) : (
+          <div className={styles.btnBox}>
+            <button type="submit" className={styles.submitBtn}>
+              Save
+            </button>
+          </div>
+        )}
+      </form>
 
+      <form onSubmit={handleManhwaSubmit} className={styles.form}>
         <div className={styles.manhwaContainer}>
           <h2>Edit Manhwa</h2>
 
@@ -149,7 +196,7 @@ const EditModal = ({ isModalOpen, onClose, onSave, manhwa, site }) => {
             <textarea
               className={styles.textarea}
               name="genre"
-              value={editedManhwa.genre?.join(", ")}
+              value={editedManhwa.genre}
               onChange={handleManhwaChange}
             />
           </label>
@@ -165,16 +212,30 @@ const EditModal = ({ isModalOpen, onClose, onSave, manhwa, site }) => {
         </div>
 
         <div className={styles.btnBox}>
-          <button type="submit" className={styles.submitBtn}>
-            Save
-          </button>
-          <button
-            type="button"
-            onClick={handleClose}
-            className={styles.cancelBtn}
-          >
-            Cancel
-          </button>
+          {confirmingManhwa ? (
+            <div className={styles.confirmBox}>
+              <p>Are you sure you want to change the manhwa info?</p>
+              <button type="button" onClick={() => confirmManhwa(true)}>
+                Yes
+              </button>
+              <button type="button" onClick={() => confirmManhwa(false)}>
+                No
+              </button>
+            </div>
+          ) : (
+            <div className={styles.btnBox}>
+              <button type="submit" className={styles.submitBtn}>
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={handleClose}
+                className={styles.cancelBtn}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
       </form>
     </dialog>

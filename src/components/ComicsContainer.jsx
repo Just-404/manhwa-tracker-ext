@@ -2,7 +2,15 @@ import ReactPaginate from "react-paginate";
 import ManhwaCard from "./ManhwaCard";
 import styles from "../css/library.module.css";
 
-const ComicsSection = ({ data, onPageCount, pageCount }) => {
+const ComicsSection = ({
+  data,
+  onPageCount,
+  pageCount,
+  onEditSite,
+  onEditManhwa,
+  onChangeFav,
+  onDeleteManhwa,
+}) => {
   const handlePageClick = (e) => {
     let newPage = e.selected + 1;
     onPageCount(newPage);
@@ -17,6 +25,10 @@ const ComicsSection = ({ data, onPageCount, pageCount }) => {
             key={manhwaData.manhwa.idManhwa}
             manhwa={manhwaData.manhwa}
             site={manhwaData.site}
+            onEditSite={onEditSite}
+            onEditManhwa={onEditManhwa}
+            onChangeFav={onChangeFav}
+            onDeleteManhwa={onDeleteManhwa}
           />
         ))}
       </section>

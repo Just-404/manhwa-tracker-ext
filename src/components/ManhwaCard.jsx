@@ -2,13 +2,28 @@ import { useState } from "react";
 import styles from "../css/manhwaCard.module.css";
 import ManhwaStatus from "../js/utils/enums";
 import EditModal from "./EditModal";
+import confirmModal from "../components/ConfirmModal";
 
-const ManhwaCard = ({ manhwa, site }) => {
+const ManhwaCard = ({
+  manhwa,
+  site,
+  onEditSite,
+  onEditManhwa,
+  onChangeFav,
+  onDeleteManhwa,
+}) => {
   const [isFavorite, setIsFavorite] = useState(manhwa.isFavorite);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleFavorite = () => {
     setIsFavorite(!isFavorite);
+    onChangeFav(manhwa.idManhwa, !isFavorite);
+  };
+  const handleDelete = async () => {
+    const result = await confirmModal(`Delete ${manhwa.title}?`);
+    if (result) {
+      onDeleteManhwa(manhwa.idManhwa);
+    }
   };
   return (
     <>
@@ -48,7 +63,7 @@ const ManhwaCard = ({ manhwa, site }) => {
         <div className={styles.cardBody}>
           <div className={styles.chaptersBox}>
             <p>
-              <b>Chapters:</b> {manhwa.chapters}
+              <b>Chapters:</b> {manhwa.chapters ?? "---"}
             </p>
             <p>
               <b>{manhwa.status} </b>
@@ -127,7 +142,11 @@ const ManhwaCard = ({ manhwa, site }) => {
               />
             </svg>
           </button>
-          <button className={styles.iconBtn} aria-label="Delete">
+          <button
+            className={styles.iconBtn}
+            aria-label="Delete"
+            onClick={handleDelete}
+          >
             <svg
               fill="#e00000"
               height="24px"
@@ -152,10 +171,8 @@ const ManhwaCard = ({ manhwa, site }) => {
           site={site}
           isModalOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onSave={(updatedManhwa, updatedSiteInfo) => {
-            // future update WIP
-            setIsModalOpen(false);
-          }}
+          onEditSite={onEditSite}
+          onEditManhwa={onEditManhwa}
         />
       )}
     </>

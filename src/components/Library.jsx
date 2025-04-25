@@ -6,8 +6,9 @@ import { useDexie } from "../db/useDexie";
 import addToastMessage from "../js/utils/toastify";
 
 const Library = () => {
-  const { getManhwas } = useDexie();
-  const [comics, setComics] = useState([]);
+  const { getManhwas, updateSite, updateMahwa, updateFavorite, deleteManhwa } =
+    useDexie();
+  const [comics, setComics] = useState();
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -25,12 +26,59 @@ const Library = () => {
     },
     [getManhwas]
   );
+
   useEffect(() => {
     fetchManhwas();
   }, [currentPage, fetchManhwas]);
+
+  const handleSiteEdit = async (id, editedSite) => {
+    try {
+      console.log(id, editedSite);
+
+      const data = await updateSite(id, editedSite);
+      if (!data) return;
+      addToastMessage("success", "Site updated!");
+      fetchManhwas(currentPage);
+    } catch (error) {
+      addToastMessage("error", error.message);
+      console.log(error);
+    }
+  };
+  const handleManhwaEdit = async (id, editedManhwa) => {
+    try {
+      const data = await updateMahwa(id, editedManhwa);
+      if (!data) return;
+      addToastMessage("success", "Manhwa updated!");
+      fetchManhwas(currentPage);
+    } catch (error) {
+      addToastMessage("error", error.message);
+      console.log(error);
+    }
+  };
+  const handleChangeFav = async (idManhwa, fav) => {
+    try {
+      const data = await updateFavorite(idManhwa, fav);
+      if (!data) return;
+      addToastMessage("success", "Favorite updated!");
+      fetchManhwas(currentPage);
+    } catch (error) {
+      addToastMessage("error", error.message);
+      console.log(error);
+    }
+  };
+  const handleDeleteManhwa = async (idManhwa) => {
+    try {
+      await deleteManhwa(idManhwa);
+
+      addToastMessage("success", "Deleted successfully!");
+      fetchManhwas(currentPage);
+    } catch (error) {
+      addToastMessage("error", error.message);
+      console.log(error);
+    }
+  };
   return (
     <>
-      {" "}
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -42,6 +90,8 @@ const Library = () => {
         draggable
         pauseOnHover
         theme="light"
+        toastStyle={{ zIndex: 9999 }}
+        toastContainerStyle={{ zIndex: 2000 }}
       />
       <div className={styles.libraryContainer}>
         <header className={styles.libraryHeader}>
@@ -64,8 +114,12 @@ const Library = () => {
           {
             <ComicsContainer
               data={comics}
-              onPageCount={setPageCount}
+              onPageCount={(page) => setCurrentPage(page)}
               pageCount={pageCount}
+              onEditSite={handleSiteEdit}
+              onEditManhwa={handleManhwaEdit}
+              onChangeFav={handleChangeFav}
+              onDeleteManhwa={handleDeleteManhwa}
             />
           }
         </main>

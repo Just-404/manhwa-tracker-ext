@@ -82,8 +82,16 @@ export const useDexie = () => {
       return { manhwasAndSite, total: count };
     };
 
-    const updateMahwa = async (id, newManhwa) => {
-      return await db.manhwa.update(id, newManhwa);
+    const updateMahwa = async (id, newManhwaInfo) => {
+      return await db.manhwa.update(id, newManhwaInfo);
+    };
+
+    const updateSite = async (id, newSiteInfo) => {
+      return await db.site.update(id, newSiteInfo);
+    };
+
+    const updateFavorite = async (idManhwa, fav) => {
+      return await db.manhwa.update(idManhwa, { isFavorite: fav });
     };
 
     const deleteManhwa = async (id) => {
@@ -137,6 +145,8 @@ export const useDexie = () => {
       addManhwaWithSite,
       getManhwas,
       updateMahwa,
+      updateFavorite,
+      updateSite,
       deleteManhwa,
       importDatabase,
       exportDataBase,

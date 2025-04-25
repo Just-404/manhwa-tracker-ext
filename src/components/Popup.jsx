@@ -23,6 +23,7 @@ const Popup = () => {
             } else if (response) {
               setSite(response.site);
               setManhwa(response.manhwa);
+              console.log(response.manhwa);
             }
           }
         );
@@ -55,10 +56,22 @@ const Popup = () => {
       if (result.updated)
         addToastMessage("success", "Last read chapter updated!");
       if (result.skipped) addToastMessage("warning", "Skipped update.");
+
+      resetForm();
     } catch (error) {
       alert("Error saving");
       console.log("Error saving data!", error);
     }
+  };
+  const resetForm = () => {
+    setSite({ name: "" });
+    setManhwa({
+      title: "",
+      chapters: 0,
+      lastReadChapter: 0,
+      status: ManhwaStatus.UNKNOWN,
+      note: "",
+    });
   };
   return (
     <>
@@ -89,7 +102,9 @@ const Popup = () => {
             name="site"
             value={site.name}
             required
-            onChange={(e) => (prev) => ({ ...prev, name: e.target.value })}
+            onChange={(e) =>
+              setSite((prev) => ({ ...prev, name: e.target.value }))
+            }
           />
         </div>
         <div className={styles.inputBox}>
@@ -103,19 +118,21 @@ const Popup = () => {
             required
           />
         </div>
-        <div className={styles.inputBox}>
-          <label htmlFor="chapter">Chapters: </label>
-          <input
-            type="number"
-            id="chapter"
-            name="chapter"
-            min="0"
-            step="1"
-            value={manhwa.chapters}
-            onChange={handleManhwaInputChange}
-            required
-          />
-        </div>
+        {manhwa.chapters != null && (
+          <div className={styles.inputBox}>
+            <label htmlFor="chapter">Chapters: </label>
+            <input
+              type="number"
+              id="chapter"
+              name="chapter"
+              min="0"
+              step="1"
+              value={manhwa.chapters}
+              onChange={handleManhwaInputChange}
+              required
+            />
+          </div>
+        )}
         <div className={styles.inputBox}>
           <label htmlFor="lastChapter">Current chapter: </label>
           <input

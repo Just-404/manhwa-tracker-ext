@@ -15,7 +15,11 @@ const addToastMessage = (
     draggable: true,
     progress: undefined,
     theme,
-    style: { width: "80%" },
+    style: {
+      width: "auto",
+      maxWidth: "90vw",
+      wordBreak: "break-word",
+    },
   });
 };
 export default addToastMessage;
