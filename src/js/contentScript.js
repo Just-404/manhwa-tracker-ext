@@ -12,7 +12,7 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const site = {
         name: baseUrl.split(".")[0],
         baseUrl,
-        isActive: true,
+        isActive: 1,
         language: navigator.language,
         lastChecked: new Date().toISOString(),
         imgUrl: `https://s2.googleusercontent.com/s2/favicons?domain_url=https://${baseUrl}`,
@@ -23,7 +23,7 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
         chapters: null,
         currentChapterUrl: window.location.href,
         lastReadChapter: extractChapterFromUrl(window.location.href),
-        isFavorite: false,
+        isFavorite: 0,
         status: null,
         lastTimeRead: new Date().toISOString(),
         imgUrl: null,

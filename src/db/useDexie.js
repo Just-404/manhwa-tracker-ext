@@ -1,5 +1,6 @@
 import { useDb } from "./DbContext";
 import { useMemo } from "react";
+import Dexie from "dexie";
 
 export const useDexie = () => {
   const db = useDb();
@@ -18,7 +19,7 @@ export const useDexie = () => {
       } else {
         siteId = await db.site.add({
           ...siteData,
-          isActive: true,
+          isActive: 1,
           lastChecked: new Date().toISOString(),
         });
       }
@@ -94,6 +95,30 @@ export const useDexie = () => {
       return { manhwasAndSite, total: count };
     };
 
+    const getFavoriteManhwas = async (page = 1, pageSize = 20) => {
+      const offset = (page - 1) * pageSize;
+      if (!db || !db.manhwa) {
+        console.error("Database or manhwa table not initialized", db);
+        return { manhwasAndSite: [], total: 0 };
+      }
+
+      const count = await db.manhwa.where("isFavorite").equals(1).count();
+
+      const favorites = await db.manhwa
+        .where("isFavorite")
+        .equals(1)
+        .offset(offset)
+        .limit(pageSize)
+        .toArray();
+
+      const manhwasAndSite = await Promise.all(
+        favorites.map(async (manhwa) => {
+          const site = await db.site.get(manhwa.idSite);
+          return { manhwa, site };
+        })
+      );
+      return { manhwasAndSite, total: count };
+    };
     const searchByName = async (name, page = 1, pageSize = 20) => {
       if (name === "") {
         throw new Error("The search term is empty");
@@ -132,7 +157,7 @@ export const useDexie = () => {
     };
 
     const updateFavorite = async (idManhwa, fav) => {
-      return await db.manhwa.update(idManhwa, { isFavorite: fav });
+      return await db.manhwa.update(idManhwa, { isFavorite: fav ? 1 : 0 });
     };
 
     const deleteManhwa = async (id) => {
@@ -193,6 +218,7 @@ export const useDexie = () => {
       addManhwaWithSite,
       getManhwas,
       searchByName,
+      getFavoriteManhwas,
       updateMahwa,
       updateFavorite,
       updateSite,

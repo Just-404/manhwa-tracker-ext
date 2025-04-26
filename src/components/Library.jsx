@@ -10,6 +10,7 @@ import ManhwaStatus from "../js/utils/enums";
 const Library = () => {
   const {
     getManhwas,
+    getFavoriteManhwas,
     updateSite,
     searchByName,
     updateMahwa,
@@ -22,6 +23,7 @@ const Library = () => {
   const [sortBy, setSortBy] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [openMenu, setOpenMenu] = useState(false);
+  const [favoriteSelected, setFavoriteSelected] = useState(false);
 
   const fetchManhwas = useCallback(
     async ({ currentPage = 1, limit = 20, sortBy = null }) => {
@@ -48,6 +50,7 @@ const Library = () => {
           currentPage,
           limit
         );
+
         setComics(manhwasAndSite);
         setPageCount(Math.ceil(total / limit));
       } catch (error) {
@@ -57,9 +60,36 @@ const Library = () => {
     },
     [searchByName]
   );
+  const fetchFavoriteManhwas = useCallback(
+    async ({ currentPage = 1, limit = 20 }) => {
+      try {
+        const { manhwasAndSite, total } = await getFavoriteManhwas(
+          currentPage,
+          limit
+        );
+
+        setComics(manhwasAndSite);
+        setPageCount(Math.ceil(total / limit));
+      } catch (error) {
+        addToastMessage("error", "Error getting data!");
+        console.log("Error getting data", error.message);
+      }
+    },
+    [getFavoriteManhwas]
+  );
   useEffect(() => {
+    if (favoriteSelected) {
+      fetchFavoriteManhwas({ currentPage, limit: 20 });
+      return;
+    }
     fetchManhwas({ currentPage, sortBy });
-  }, [currentPage, fetchManhwas, sortBy]);
+  }, [
+    currentPage,
+    fetchManhwas,
+    sortBy,
+    favoriteSelected,
+    fetchFavoriteManhwas,
+  ]);
 
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
@@ -114,8 +144,10 @@ const Library = () => {
 
   const handleClearSearchInput = () => {
     setSearchTerm("");
-    fetchManhwas({ page: 1, sortBy });
+    setFavoriteSelected(false);
     setCurrentPage(1);
+
+    fetchManhwas({ currentPage: 1, sortBy });
   };
 
   const handleCloseMenu = () => {
@@ -165,7 +197,7 @@ const Library = () => {
                 Search
               </button>
             </div>
-            {searchTerm === "" ? (
+            {searchTerm === "" && !favoriteSelected ? (
               <div className={styles.sortDiv}>
                 <h2>Status:</h2>
                 <select
@@ -184,10 +216,33 @@ const Library = () => {
                     </option>
                   ))}
                 </select>
+                <button
+                  className={styles.iconBtn}
+                  aria-label="Favorite"
+                  onClick={() => setFavoriteSelected(!favoriteSelected)}
+                >
+                  <svg
+                    fill={favoriteSelected ? "red" : "#aaa"}
+                    height="24px"
+                    width="24px"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+                    2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 
+                    4.5 2.09C13.09 3.81 14.76 3 16.5 3 
+                    19.58 3 22 5.42 22 8.5c0 3.78-3.4 
+                    6.86-8.55 11.54L12 21.35z"
+                    />
+                  </svg>
+                </button>
               </div>
             ) : (
               <div>
-                <button onClick={handleClearSearchInput}>Clear</button>
+                <button onClick={handleClearSearchInput} style={{}}>
+                  &#8635;
+                </button>
               </div>
             )}
           </div>

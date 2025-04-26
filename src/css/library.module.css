@@ -79,6 +79,18 @@
   cursor: pointer;
   min-width: 120px;
 }
+
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
 .libraryMain {
   padding: 0.4rem 1rem;
   display: grid;
