@@ -1,0 +1,54 @@
+.sidenav {
+  height: 100%;
+  width: 20%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+.linksDiv {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 1em;
+  padding: 1rem;
+}
+
+.linksDiv li {
+  list-style-type: none;
+}
+.sidenav a {
+  text-align: end;
+  text-decoration: none;
+  font-size: 1rem;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+.sidenav .closeBtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+@media screen and (max-width: 600px) {
+  .sidenav {
+    padding-top: 2rem;
+    width: 50%;
+  }
+  .sidenav a {
+    font-size: 18px;
+  }
+}

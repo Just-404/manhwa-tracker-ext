@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { ToastContainer } from "react-toastify";
 import styles from "../css/library.module.css";
 import ComicsContainer from "./ComicsContainer";
+import SidebarMenu from "./SidebarMenu";
 import { useDexie } from "../db/useDexie";
 import addToastMessage from "../js/utils/toastify";
 import ManhwaStatus from "../js/utils/enums";
@@ -20,9 +21,10 @@ const Library = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [openMenu, setOpenMenu] = useState(false);
 
   const fetchManhwas = useCallback(
-    async ({ currentPage = 1, limit = 20, sortBy }) => {
+    async ({ currentPage = 1, limit = 20, sortBy = null }) => {
       try {
         const { manhwasAndSite, total } = await getManhwas(
           currentPage,
@@ -115,6 +117,10 @@ const Library = () => {
     fetchManhwas({ page: 1, sortBy });
     setCurrentPage(1);
   };
+
+  const handleCloseMenu = () => {
+    setOpenMenu(!openMenu);
+  };
   return (
     <>
       <ToastContainer
@@ -131,9 +137,20 @@ const Library = () => {
         toastStyle={{ zIndex: 9999 }}
         toastContainerStyle={{ zIndex: 2000 }}
       />
+
+      {openMenu && (
+        <SidebarMenu onClose={handleCloseMenu} onReload={fetchManhwas} />
+      )}
+
       <div className={styles.libraryContainer}>
         <header className={styles.libraryHeader}>
           <h1>My library</h1>
+          <span
+            style={{ fontSize: "30px", cursor: "pointer" }}
+            onClick={() => setOpenMenu(true)}
+          >
+            &#9776;
+          </span>
         </header>
 
         <main className={styles.libraryMain}>

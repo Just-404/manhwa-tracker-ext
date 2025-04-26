@@ -139,7 +139,7 @@ export const useDexie = () => {
       return await db.manhwa.delete(id);
     };
 
-    const exportDataBase = async (a) => {
+    const exportDataBase = async () => {
       const manhwas = await db.manhwa.toArray();
       const sites = await db.site.toArray();
       const dateNow = new Date();
@@ -158,14 +158,19 @@ export const useDexie = () => {
       });
 
       const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
       a.href = url;
       a.download = `manhwa_backup_${dateNow
         .toISOString()
         .replace(/[:.]/g, "-")}.json`;
-
+      document.body.appendChild(a);
+      a.click();
       a.onclick = () => {
         setTimeout(() => URL.revokeObjectURL(url), 1000);
+        document.body.removeChild(a);
       };
+
+      return { message: "Exported correctly!" };
     };
 
     const importDatabase = async (file) => {
@@ -181,6 +186,8 @@ export const useDexie = () => {
         await db.site.clear();
         await db.site.bulkAdd(data.sites);
       }
+
+      return { message: "Imported correctly!" };
     };
     return {
       addManhwaWithSite,
