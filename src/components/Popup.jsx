@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import addToastMessage from "../js/utils/toastify";
-import confirmModal from "../components/ConfirmModal";
+import confirmModal from "../js/utils/confirmModal";
 import styles from "../css/popup.module.css";
 import ManhwaStatus from "../js/utils/enums";
 import { useDexie } from "../db/useDexie";

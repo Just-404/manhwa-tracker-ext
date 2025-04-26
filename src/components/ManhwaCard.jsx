@@ -2,7 +2,7 @@ import { useState } from "react";
 import styles from "../css/manhwaCard.module.css";
 import ManhwaStatus from "../js/utils/enums";
 import EditModal from "./EditModal";
-import confirmModal from "../components/ConfirmModal";
+import confirmModal from "../js/utils/confirmModal";
 
 const ManhwaCard = ({
   manhwa,

@@ -1,44 +1,20 @@
-import { toast } from "react-toastify";
+import style from "../css/confirmModal.module.css";
+import { confirmable } from "react-confirm";
 
-const confirmToastify = (msg) => {
-  return new Promise((resolve) => {
-    toast(
-      <div>
-        <p>{msg}</p>
-        <div
-          style={{
-            marginTop: "10px",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <button
-            onClick={() => {
-              toast.dismiss();
-              resolve(true);
-            }}
-          >
-            Yes
-          </button>
-          <button
-            onClick={() => {
-              toast.dismiss();
-              resolve(false);
-            }}
-          >
-            No
-          </button>
+const ConfirmModal = ({ show, proceed, confirmation }) => {
+  if (!show) return null;
+  return (
+    <div className={style.modalOverlay}>
+      <div className={style.modalBox}>
+        <h2>Confirm</h2>
+        <p>{confirmation}</p>
+        <div className={style.modalButtons}>
+          <button onClick={() => proceed(true)}>Yes</button>
+          <button onClick={() => proceed(false)}>No</button>
         </div>
-      </div>,
-      {
-        position: "bottom-center",
-        autoClose: false,
-        closeOnClick: false,
-        closeButton: false,
-        draggable: false,
-      }
-    );
-  });
+      </div>
+    </div>
+  );
 };
 
-export default confirmToastify;
+export default confirmable(ConfirmModal);
