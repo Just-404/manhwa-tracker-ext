@@ -14,19 +14,30 @@ const Popup = () => {
   useEffect(() => {
     chrome.tabs?.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(
-          tabs[0].id,
-          { action: "extractInfo" },
-          (response) => {
-            if (chrome.runtime.lastError) {
-              console.log("Error:", chrome.runtime.lastError.message);
-            } else if (response) {
-              setSite(response.site);
-              setManhwa(response.manhwa);
-              console.log(response.manhwa);
-            }
+        const tabId = tabs[0].id;
+
+        chrome.tabs.executeScript(tabId, { file: "contentScript.js" }, () => {
+          if (chrome.runtime.lastError) {
+            console.log(
+              "Error injecting content script:",
+              chrome.runtime.lastError.message
+            );
+            return;
           }
-        );
+          chrome.tabs.sendMessage(
+            tabs[0].id,
+            { action: "extractInfo" },
+            (response) => {
+              if (chrome.runtime.lastError) {
+                console.log("Error:", chrome.runtime.lastError.message);
+              } else if (response) {
+                setSite(response.site);
+                setManhwa(response.manhwa);
+                console.log(response.manhwa);
+              }
+            }
+          );
+        });
       }
     });
   }, []);
