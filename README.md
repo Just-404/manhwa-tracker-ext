@@ -5,7 +5,7 @@ It uses the anilist api to fetch some of the manhwa/manga data and Dexie to save
 How to use:
 
 1. Visit one of the pages where you can read your favorite manhwa/manga/comic, then press the extension
-   button and most of the information will be automatically generated for the suer to edit/review.
+   button in THE CURRENT CHAPTER that you are reading and most of the information will be automatically generated for the suer to edit/review.
 
 2. When clicking save, the information will be automatically saved.
 
@@ -15,3 +15,11 @@ How to use:
 4. In library.html is where all the saved manhwas/mangas/comics are shown and can be edited, deleted, etc.
 
 5. To import/export, click in the menu button.
+
+TO INSTALL:
+
+npm install
+
+TO BUILD:
+
+npm run build

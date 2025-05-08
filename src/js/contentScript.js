@@ -1,4 +1,8 @@
-import { cleanTitle, extractChapterFromUrl } from "./utils/utils";
+import {
+  cleanTitle,
+  extractChapterFromUrl,
+  getDomainName,
+} from "./utils/utils";
 
 const runtime = browser.runtime || chrome.runtime;
 
@@ -10,7 +14,7 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const cleanedTitle = decodeURIComponent(cleanTitle(title));
 
       const site = {
-        name: baseUrl.split(".")[0],
+        name: getDomainName(baseUrl),
         baseUrl,
         isActive: 1,
         language: navigator.language,

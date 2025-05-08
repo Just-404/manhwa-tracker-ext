@@ -9,7 +9,6 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: "dist",
-    sourcemap: true,
     rollupOptions: {
       input: {
         popup: resolve(__dirname, "index.html"),

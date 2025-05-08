@@ -46,7 +46,11 @@ const ManhwaCard = ({
           </div>
 
           <div className={styles.siteTitle}>
-            <a href={site.baseUrl} target="blank" rel="noopener noreferrer">
+            <a
+              href={`https://${site.baseUrl}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <img src={site.imgUrl} alt={`${site.name} logo`} />
             </a>
             <p>
@@ -70,7 +74,7 @@ const ManhwaCard = ({
               <b>Chapters:</b> {manhwa.chapters ?? "---"}
             </p>
             <p>
-              <b>{manhwa.status} </b>
+              <b>{manhwa.status ?? "UNKNOWN"} </b>
             </p>
             <div
               className={

@@ -33,7 +33,6 @@ const Popup = () => {
               } else if (response) {
                 setSite(response.site);
                 setManhwa(response.manhwa);
-                console.log(response.manhwa);
               }
             }
           );
@@ -84,6 +83,20 @@ const Popup = () => {
       note: "",
     });
   };
+
+  const openLibraryTab = () => {
+    const tabs = window.browser?.tabs || window.chrome?.tabs;
+
+    tabs.create({
+      url: (window.browser || window.chrome).runtime.getURL("library.html"),
+    });
+
+    const isFirefoxMobile = /Fennec|Android.*Firefox/.test(navigator.userAgent);
+
+    if (isFirefoxMobile) {
+      window.close();
+    }
+  };
   return (
     <>
       <ToastContainer
@@ -100,9 +113,8 @@ const Popup = () => {
       />
       <div className={styles.popupHeader}>
         <h1>Information</h1>
-        <a href="library.html" target="_blank" rel="noopener noreferrer">
-          <button>Go to library</button>
-        </a>
+
+        <button onClick={openLibraryTab}>Go to library</button>
       </div>
       <form action="#" id={styles.popupForm} onSubmit={handleSubmit}>
         <div className={styles.inputBox}>

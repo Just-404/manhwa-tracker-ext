@@ -18,5 +18,11 @@ const extractChapterFromUrl = (url) => {
 
   return match ? parseFloat(match[1]) : null;
 };
+const getDomainName = (hostname) => {
+  const parts = hostname.split(".");
+  if (parts.length <= 2) return parts[0];
+  if (parts[0] === "www") parts.shift();
+  return parts[parts.length - 2];
+};
 
-export { cleanTitle, extractChapterFromUrl };
+export { cleanTitle, extractChapterFromUrl, getDomainName };
