@@ -3,6 +3,8 @@
   max-width: 350px;
   box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
   padding-bottom: 1em;
+  display: grid;
+  grid-template-rows: auto 1fr;
 }
 .cardHeader {
   width: 100%;
@@ -13,8 +15,10 @@
   align-items: center;
   gap: 0.5em;
 }
+
 .cardHeader .comicTitle img {
   width: 100%;
+  min-height: 310px;
   height: auto;
   cursor: pointer;
   object-fit: cover;

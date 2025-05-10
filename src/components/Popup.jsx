@@ -41,6 +41,26 @@ const Popup = () => {
     });
   }, []);
 
+  const fetchComicInfo = async (title) => {
+    if (!title) return;
+    const runtime = browser.runtime || chrome.runtime;
+
+    runtime.sendMessage({ action: "fetchComicData", title }, (response) => {
+      if (response?.success && response.data) {
+        const media = response.data;
+        setManhwa((prev) => ({
+          ...prev,
+          chapters: media.chapters,
+          genre: media.genres.join(", "),
+          imgUrl: media.coverImage.large,
+          status: media.status || prev.status,
+        }));
+      } else {
+        console.warn("Anilist fetch failed or returned no data");
+      }
+    });
+  };
+
   const handleManhwaInputChange = (e) => {
     const { name, value } = e.target;
     setManhwa((prev) => ({
@@ -132,14 +152,33 @@ const Popup = () => {
         </div>
         <div className={styles.inputBox}>
           <label htmlFor="title">Title: </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={manhwa.title}
-            onChange={handleManhwaInputChange}
-            required
-          />
+          <div className={styles.searchManuallyBox}>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={manhwa.title}
+              onChange={handleManhwaInputChange}
+              required
+            />
+
+            <button type="button" onClick={() => fetchComicInfo(manhwa.title)}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
+          </div>
         </div>
         {manhwa.chapters != null && (
           <div className={styles.inputBox}>

@@ -10,10 +10,15 @@ const ComicsSection = ({
   onEditManhwa,
   onChangeFav,
   onDeleteManhwa,
+  forcePage,
 }) => {
   const handlePageClick = (e) => {
     let newPage = e.selected + 1;
     onPageCount(newPage);
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 50);
   };
   return !data || data.length === 0 ? (
     <div>Data not Found</div>
@@ -36,8 +41,10 @@ const ComicsSection = ({
         breakLabel="..."
         nextLabel="Next >"
         onPageChange={handlePageClick}
-        pageRangeDisplayed={5}
+        pageRangeDisplayed={2}
+        marginPagesDisplayed={1}
         pageCount={pageCount}
+        forcePage={forcePage}
         previousLabel="< Prev"
         renderOnZeroPageCount={null}
         containerClassName={styles.pagination}

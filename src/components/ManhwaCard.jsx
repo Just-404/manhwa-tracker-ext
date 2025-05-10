@@ -88,13 +88,6 @@ const ManhwaCard = ({
               }
             ></div>
           </div>
-          <div className={styles.genreBox}>
-            <p>
-              <b>Genres: </b>
-            </p>
-            <p className={styles.genreP}>{manhwa.genre}</p>
-          </div>
-
           <div>
             <p>
               <b>Last read chapter:</b> {manhwa.lastReadChapter}
@@ -104,6 +97,13 @@ const ManhwaCard = ({
               <i>{new Date(manhwa.lastTimeRead).toLocaleString()}</i>
             </p>
           </div>
+          <div className={styles.genreBox}>
+            <p>
+              <b>Genres: </b>
+            </p>
+            <p className={styles.genreP}>{manhwa.genre}</p>
+          </div>
+
           <p>
             <b>Note: </b> {manhwa.note}
           </p>

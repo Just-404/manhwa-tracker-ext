@@ -1,6 +1,5 @@
 import { useDb } from "./DbContext";
 import { useMemo } from "react";
-import Dexie from "dexie";
 
 export const useDexie = () => {
   const db = useDb();
@@ -42,6 +41,7 @@ export const useDexie = () => {
               ...existingManhwaOnSite,
               lastReadChapter: manhwaData.lastReadChapter,
               lastTimeRead: new Date().toISOString(),
+              currentChapterUrl: manhwaData.currentChapterUrl,
             });
           });
           return { updated: true, id: existingManhwaOnSite.idManhwa };

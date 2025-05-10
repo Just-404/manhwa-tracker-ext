@@ -21,6 +21,7 @@ const Library = () => {
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState(null);
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [openMenu, setOpenMenu] = useState(false);
   const [favoriteSelected, setFavoriteSelected] = useState(false);
@@ -78,23 +79,21 @@ const Library = () => {
     [getFavoriteManhwas]
   );
   useEffect(() => {
-    if (favoriteSelected) {
-      fetchFavoriteManhwas({ currentPage, limit: 20 });
-      return;
+    const limit = 20;
+
+    if (activeSearchTerm) {
+      fetchManhwasByName({ currentPage, limit, searchTerm: activeSearchTerm });
+    } else if (favoriteSelected) {
+      fetchFavoriteManhwas({ currentPage, limit });
+    } else {
+      fetchManhwas({ currentPage, sortBy });
     }
-    fetchManhwas({ currentPage, sortBy });
-  }, [
-    currentPage,
-    fetchManhwas,
-    sortBy,
-    favoriteSelected,
-    fetchFavoriteManhwas,
-  ]);
+  }, [currentPage, sortBy, activeSearchTerm, favoriteSelected]);
 
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
-
-    fetchManhwasByName({ currentPage, searchTerm });
+    setActiveSearchTerm(searchTerm.trim());
+    setCurrentPage(1);
   };
 
   const handleSiteEdit = async (id, editedSite) => {
@@ -102,7 +101,7 @@ const Library = () => {
       const data = await updateSite(id, editedSite);
       if (!data) return;
       addToastMessage("success", "Site updated!");
-      fetchManhwas(currentPage);
+      fetchManhwas({ currentPage });
     } catch (error) {
       addToastMessage("error", error.message);
       console.log(error);
@@ -113,7 +112,7 @@ const Library = () => {
       const data = await updateMahwa(id, editedManhwa);
       if (!data) return;
       addToastMessage("success", "Manhwa updated!");
-      fetchManhwas(currentPage);
+      fetchManhwas({ currentPage });
     } catch (error) {
       addToastMessage("error", error.message);
       console.log(error);
@@ -135,7 +134,40 @@ const Library = () => {
       await deleteManhwa(idManhwa);
 
       addToastMessage("success", "Deleted successfully!");
-      fetchManhwas(currentPage);
+
+      const limit = 20;
+
+      let manhwasAndSite, total;
+
+      if (searchTerm.trim()) {
+        ({ manhwasAndSite, total } = await searchByName(
+          searchTerm,
+          currentPage,
+          limit
+        ));
+      } else if (favoriteSelected) {
+        ({ manhwasAndSite, total } = await getFavoriteManhwas(
+          currentPage,
+          limit
+        ));
+      } else {
+        ({ manhwasAndSite, total } = await getManhwas(
+          currentPage,
+          limit,
+          sortBy
+        ));
+      }
+
+      const newPageCount = Math.ceil(total / limit);
+
+      // If the current page is now empty and not the first page, go back a page
+      if (manhwasAndSite.length === 0 && currentPage > 1) {
+        const newPage = currentPage - 1;
+        setCurrentPage(newPage);
+      } else {
+        setComics(manhwasAndSite);
+        setPageCount(newPageCount);
+      }
     } catch (error) {
       addToastMessage("error", error.message);
       console.log(error);
@@ -144,9 +176,9 @@ const Library = () => {
 
   const handleClearSearchInput = () => {
     setSearchTerm("");
+    setActiveSearchTerm("");
     setFavoriteSelected(false);
     setCurrentPage(1);
-
     fetchManhwas({ currentPage: 1, sortBy });
   };
 
@@ -256,6 +288,7 @@ const Library = () => {
               onEditManhwa={handleManhwaEdit}
               onChangeFav={handleChangeFav}
               onDeleteManhwa={handleDeleteManhwa}
+              forcePage={currentPage - 1}
             />
           }
         </main>
