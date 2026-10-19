@@ -1,0 +1,246 @@
+.favoritesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0 1.25rem;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.sectionTitle svg {
+  color: var(--favorite);
+}
+
+.sectionCount {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.navButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.navBtn {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.navBtn:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-3);
+  border-color: var(--border-strong);
+}
+
+.navBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.pageIndicator {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 2.6em;
+  text-align: center;
+}
+
+.carouselWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+}
+
+.embla {
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.emblaViewport {
+  overflow: hidden;
+  /* Permite desplazar la página en vertical, pero deja el arrastre
+     horizontal a Embla (necesario para el swipe en móvil). */
+  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
+}
+
+.emblaContainer {
+  display: flex;
+  gap: 0.8rem;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.emblaSlide {
+  flex: 0 0 116px;
+  min-width: 0;
+}
+
+.arrowBtn {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease,
+    background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.arrowBtn:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-3);
+  border-color: var(--border-strong);
+}
+
+.arrowBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.coverLink {
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  line-height: 0;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.coverLink:hover {
+  border-color: var(--border-strong);
+}
+
+.coverLink:active {
+  transform: scale(0.96);
+}
+
+.coverLink img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+
+.itemTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.3;
+  min-height: calc(2 * 1.3 * 0.8rem);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.dot,
+.dotActive {
+  height: 9px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--border-strong);
+  cursor: pointer;
+  transition: background-color 0.15s ease, width 0.2s ease;
+}
+
+.dot {
+  width: 9px;
+}
+
+.dotActive {
+  width: 20px;
+  background: var(--brand);
+}
+
+@media (min-width: 601px) {
+  .carouselWrapper {
+    padding: 0 1rem;
+  }
+
+  .emblaContainer {
+    gap: 0.9rem;
+  }
+
+  .emblaSlide {
+    flex: 0 0 130px;
+  }
+
+  .arrowBtn {
+    width: 36px;
+    height: 36px;
+  }
+}

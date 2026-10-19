@@ -15,7 +15,56 @@
 @media (prefers-reduced-motion: no-preference) {
   html {
     interpolate-size: allow-keywords;
+    scroll-behavior: smooth;
   }
+}
+
+/* ── Design tokens (dark) ───────────────────────────────── */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --bg: #131a2a;
+  --bg-elevated: #0e1526;
+  --surface: #121b30;
+  --surface-2: #18233c;
+  --surface-3: #a9bff2;
+
+  /* Lines */
+  --border: #25314f;
+  --border-strong: #33436a;
+
+  /* Text */
+  --text: #e8edfa;
+  --text-muted: #97a5c6;
+  --text-faint: #7d8cb3;
+
+  /* Brand + semantics */
+  --brand: #4f7cff;
+  --brand-strong: #7ba0ff;
+  --brand-soft: rgba(79, 124, 255, 0.18);
+  --danger: #f2555a;
+  --favorite: #ff5c7a;
+
+  /* Status */
+  --status-finished: #3fb950;
+  --status-releasing: #a3e635;
+  --status-hiatus: #eab308;
+  --status-cancelled: #f2555a;
+  --status-unknown: #8b9ab8;
+
+  /* Shape */
+  --radius-card: 14px;
+  --radius-control: 10px;
+
+  /* Type */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+}
+
+html,
+body {
+  background-color: var(--bg);
 }
 
 body {
@@ -23,6 +72,28 @@ body {
   line-height: 1.5;
   /* 5. Improve text rendering */
   -webkit-font-smoothing: antialiased;
+  color: var(--text);
+  font-family: var(--font);
+}
+
+/* Browser surfaces carry the design too */
+::selection {
+  background: var(--brand);
+  color: #fff;
+}
+
+:where(input, textarea, select) {
+  caret-color: var(--brand);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 
 /* 6. Improve media defaults */

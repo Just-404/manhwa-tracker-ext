@@ -2,6 +2,25 @@ import ReactPaginate from "react-paginate";
 import ManhwaCard from "./ManhwaCard";
 import styles from "../css/library.module.css";
 
+const ChevronIcon = ({ direction }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    {direction === "left" ? (
+      <path d="m15 18-6-6 6-6" />
+    ) : (
+      <path d="m9 18 6-6-6-6" />
+    )}
+  </svg>
+);
+
 const ComicsSection = ({
   data,
   onPageCount,
@@ -21,7 +40,22 @@ const ComicsSection = ({
     }, 50);
   };
   return !data || data.length === 0 ? (
-    <div>Data not Found</div>
+    <div className={styles.emptyState}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+      </svg>
+      <p>No manhwas found</p>
+    </div>
   ) : (
     <>
       <section className={styles.manhwaSection}>
@@ -39,19 +73,25 @@ const ComicsSection = ({
       </section>
       <ReactPaginate
         breakLabel="..."
-        nextLabel="Next >"
+        nextLabel={<ChevronIcon direction="right" />}
         onPageChange={handlePageClick}
         pageRangeDisplayed={2}
         marginPagesDisplayed={1}
         pageCount={pageCount}
         forcePage={forcePage}
-        previousLabel="< Prev"
+        previousLabel={<ChevronIcon direction="left" />}
         renderOnZeroPageCount={null}
         containerClassName={styles.pagination}
-        pageLinkClassName="page-num"
-        previousLinkClassName="page-num"
-        nextLinkClassName="page-num"
+        pageClassName={styles.pageItem}
+        pageLinkClassName={styles.pageLink}
+        previousClassName={styles.pageItem}
+        previousLinkClassName={`${styles.pageLink} ${styles.pageEdge}`}
+        nextClassName={styles.pageItem}
+        nextLinkClassName={`${styles.pageLink} ${styles.pageEdge}`}
+        breakClassName={styles.breakItem}
+        breakLinkClassName={styles.pageLink}
         activeLinkClassName={styles.activeLink}
+        disabledClassName={styles.disabledItem}
       />
     </>
   );

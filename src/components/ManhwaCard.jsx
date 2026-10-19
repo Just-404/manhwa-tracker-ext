@@ -38,6 +38,8 @@ const ManhwaCard = ({
               <img
                 src={manhwa.imgUrl ?? "../../icons/icon48.png"}
                 alt={`${manhwa.title} front page`}
+                loading="lazy"
+                decoding="async"
               />
             </a>
             <h3>
@@ -78,9 +80,9 @@ const ManhwaCard = ({
             </p>
             <div
               className={
-                manhwa.status == ManhwaStatus.COMPLETED
+                manhwa.status == ManhwaStatus.FINISHED
                   ? styles.completed
-                  : manhwa.status == ManhwaStatus.DROPPED
+                  : manhwa.status == ManhwaStatus.CANCELLED
                   ? styles.dropped
                   : manhwa.status == ManhwaStatus.HIATUS
                   ? styles.hiatus
@@ -111,16 +113,21 @@ const ManhwaCard = ({
 
         <div className={styles.iconsBox}>
           <button
-            className={styles.iconBtn}
+            className={
+              isFavorite
+                ? `${styles.iconBtn} ${styles.favActive}`
+                : styles.iconBtn
+            }
             aria-label="Favorite"
+            aria-pressed={isFavorite}
             onClick={toggleFavorite}
           >
             <svg
-              fill={isFavorite ? "red" : "#aaa"}
               height="24px"
               width="24px"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
             >
               <path
                 d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
@@ -132,16 +139,16 @@ const ManhwaCard = ({
             </svg>
           </button>
           <button
-            className={styles.iconBtn}
+            className={`${styles.iconBtn} ${styles.editBtn}`}
             aria-label="Edit"
             onClick={() => setIsModalOpen(true)}
           >
             <svg
-              fill="#009ea3"
               height="24px"
               width="24px"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
             >
               <path
                 d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM21.41 
@@ -151,16 +158,16 @@ const ManhwaCard = ({
             </svg>
           </button>
           <button
-            className={styles.iconBtn}
+            className={`${styles.iconBtn} ${styles.deleteBtn}`}
             aria-label="Delete"
             onClick={handleDelete}
           >
             <svg
-              fill="#e00000"
               height="24px"
               width="24px"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
             >
               <path
                 d="M16 9v10H8V9h8m-1.5-6h-5l-1 

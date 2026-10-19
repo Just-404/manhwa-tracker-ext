@@ -1,5 +1,6 @@
 import { useDb } from "./DbContext";
 import { useMemo } from "react";
+import ManhwaStatus from "../js/utils/enums";
 
 export const useDexie = () => {
   const db = useDb();
@@ -104,12 +105,20 @@ export const useDexie = () => {
 
       const count = await db.manhwa.where("isFavorite").equals(1).count();
 
-      const favorites = await db.manhwa
+      // Orden por última lectura (más reciente primero). Se ordena en memoria
+      // para no descartar favoritos sin lastTimeRead (que no son indexables).
+      const allFavorites = await db.manhwa
         .where("isFavorite")
         .equals(1)
-        .offset(offset)
-        .limit(pageSize)
         .toArray();
+
+      allFavorites.sort((a, b) => {
+        const timeA = a.lastTimeRead ? new Date(a.lastTimeRead).getTime() : 0;
+        const timeB = b.lastTimeRead ? new Date(b.lastTimeRead).getTime() : 0;
+        return timeB - timeA;
+      });
+
+      const favorites = allFavorites.slice(offset, offset + pageSize);
 
       const manhwasAndSite = await Promise.all(
         favorites.map(async (manhwa) => {
@@ -164,6 +173,24 @@ export const useDexie = () => {
       return await db.manhwa.delete(id);
     };
 
+    const getLibraryStats = async () => {
+      if (!db || !db.manhwa) {
+        console.error("Database or manhwa table not initialized", db);
+        return { total: 0, byStatus: {} };
+      }
+
+      const total = await db.manhwa.count();
+      const byStatus = {};
+
+      await Promise.all(
+        Object.values(ManhwaStatus).map(async (status) => {
+          byStatus[status] = await db.manhwa.where("status").equals(status).count();
+        })
+      );
+
+      return { total, byStatus };
+    };
+
     const exportDataBase = async () => {
       const manhwas = await db.manhwa.toArray();
       const sites = await db.site.toArray();
@@ -172,7 +199,7 @@ export const useDexie = () => {
       const exportData = {
         metadata: {
           exportedAt: dateNow.toISOString(),
-          dbversion: 2,
+          dbversion: db.verno,
         },
         manhwas,
         sites,
@@ -219,6 +246,7 @@ export const useDexie = () => {
       getManhwas,
       searchByName,
       getFavoriteManhwas,
+      getLibraryStats,
       updateMahwa,
       updateFavorite,
       updateSite,

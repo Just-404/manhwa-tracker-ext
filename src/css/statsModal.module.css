@@ -1,0 +1,133 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 8, 18, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.statsModal {
+  width: 100%;
+  max-width: 340px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 1.1rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  animation: statsIn 0.2s ease-out;
+}
+
+@keyframes statsIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statsModal {
+    animation: none;
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.modalHeader h2 {
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.closeBtn {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.closeBtn:hover {
+  color: var(--text);
+  background: var(--surface-3);
+}
+
+.totalLine {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.totalLine b {
+  display: inline-block;
+  margin-right: 0.35rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.statsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  list-style: none;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: auto minmax(5.5rem, auto) 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.rowDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.rowLabel {
+  font-size: 0.85rem;
+}
+
+.rowBar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.rowBarFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.rowCount {
+  font-size: 0.85rem;
+  font-weight: 650;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
