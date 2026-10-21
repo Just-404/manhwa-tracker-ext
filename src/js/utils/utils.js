@@ -22,6 +22,10 @@ const getDomainName = (hostname) => {
   const parts = hostname.split(".");
   if (parts.length <= 2) return parts[0];
   if (parts[0] === "www") parts.shift();
+  // Handle multi-level TLDs (e.g., .co.uk, .com.br) where last part is 2-letter country code
+  if (parts.length >= 3 && parts[parts.length - 1].length === 2) {
+    return parts[parts.length - 3];
+  }
   return parts[parts.length - 2];
 };
 

@@ -220,7 +220,19 @@ export const useDexie = () => {
     };
 
     const deleteManhwa = async (id) => {
-      return await db.manhwa.delete(id);
+      // Delete the manhwa first
+      await db.manhwa.delete(id);
+      // Then check if the site has any remaining manhwas and delete if orphaned
+      // We need to get the manhwa's idSite first, but since we deleted it, 
+      // we should track it before deletion or query all sites.
+      // Simpler approach: check all sites for orphaned ones
+      const sites = await db.site.toArray();
+      for (const site of sites) {
+        const count = await db.manhwa.where("idSite").equals(site.idSite).count();
+        if (count === 0) {
+          await db.site.delete(site.idSite);
+        }
+      }
     };
 
     const getLibraryStats = async () => {
@@ -229,14 +241,21 @@ export const useDexie = () => {
         return { total: 0, byStatus: {} };
       }
 
-      const total = await db.manhwa.count();
+      // Single pass aggregation instead of N+1 queries
+      const allManhwas = await db.manhwa.toArray();
+      const total = allManhwas.length;
       const byStatus = {};
 
-      await Promise.all(
-        Object.values(ManhwaStatus).map(async (status) => {
-          byStatus[status] = await db.manhwa.where("status").equals(status).count();
-        })
-      );
+      // Initialize all statuses to 0
+      Object.values(ManhwaStatus).forEach((status) => {
+        byStatus[status] = 0;
+      });
+
+      // Aggregate in memory
+      for (const m of allManhwas) {
+        const status = m.status || ManhwaStatus.UNKNOWN;
+        byStatus[status] = (byStatus[status] || 0) + 1;
+      }
 
       return { total, byStatus };
     };
@@ -277,17 +296,32 @@ export const useDexie = () => {
 
     const importDatabase = async (file) => {
       const fileTxt = await file.text();
-      const data = JSON.parse(fileTxt);
-
-      if (data.manhwas) {
-        await db.manhwa.clear();
-        await db.manhwa.bulkAdd(data.manhwas);
+      let data;
+      try {
+        data = JSON.parse(fileTxt);
+      } catch {
+        throw new Error("Invalid JSON file");
       }
 
-      if (data.sites) {
-        await db.site.clear();
-        await db.site.bulkAdd(data.sites);
+      // Validate structure
+      if (!data || typeof data !== "object") {
+        throw new Error("Invalid backup format");
       }
+      if (!Array.isArray(data.manhwas) || !Array.isArray(data.sites)) {
+        throw new Error("Backup missing required arrays (manhwas, sites)");
+      }
+
+      // Use transaction to ensure atomicity
+      await db.transaction("rw", db.manhwa, db.site, async () => {
+        if (data.manhwas.length) {
+          await db.manhwa.clear();
+          await db.manhwa.bulkAdd(data.manhwas);
+        }
+        if (data.sites.length) {
+          await db.site.clear();
+          await db.site.bulkAdd(data.sites);
+        }
+      });
 
       return { message: "Imported correctly!" };
     };

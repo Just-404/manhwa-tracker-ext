@@ -47,11 +47,12 @@ Definidos en `package.json` (no hay otros):
 | `npm install` | Instala dependencias. |
 | `npm run dev` | Servidor de desarrollo Vite. |
 | `npm run build` | Build de producción en `dist/`. |
-| `npm run lint` | `eslint .` — **actualmente reporta errores** (ver `docs/testing.md`). |
+| `npm run lint` | `eslint .` — 0 errores / 3 warnings (ver `docs/testing.md`). |
 | `npm run preview` | Vista previa del build de Vite. |
+| `npm test` | Tests unitarios con Vitest (lógica pura: settings, utils). |
 
-- **No existe** script de tests, ni type-check, ni CI. No hay framework de pruebas.
-- El proyecto **no usa TypeScript** (no hay `tsconfig.json`).
+- **Existe** script de tests unitarios (`npm test` con Vitest, 28 tests pasando).
+- No hay type-check (no hay `tsconfig.json`) ni CI.
 - Entorno verificado en este repo: Node `v24.21.0`, npm `11.19.0` (puede variar).
 - El build de la extensión se carga desde `dist/` (que copia `public/manifest.json` e
   iconos y compila las entradas).
@@ -87,15 +88,9 @@ Detalle completo en [`docs/architecture.md`](docs/architecture.md).
 
 ## Defectos y hechos conocidos (estado actual)
 
-- La query de AniList se construye por **interpolación de string** del título
-  (`src/js/background.js`), sin variables GraphQL ni escapado.
-- `src/js/utils/enums.js`: el enum `ManhwaStatus` no incluye `NOT_YET_RELEASED`, valor que
-  AniList puede devolver; el `<select>` de estado podría no representarlo.
-- `src/db/useDexie.js`: `importDatabase` no valida el archivo y hace `clear()` + `bulkAdd()`
-  sin transacción; `searchByName` carga toda la tabla en memoria; `deleteManhwa` no borra
-  `site` huérfanos.
-- El lint pasa con **4 warnings** (no errores): `react-refresh/only-export-components`
-  (ConfirmModal, DbContext) y `react-hooks/exhaustive-deps` (Library). Ver `docs/testing.md`.
+- `src/db/useDexie.js`: `searchByName` carga toda la tabla en memoria (filtrado en cliente).
+- El lint pasa con **3 warnings** (no errores): `react-refresh/only-export-components`
+  (ConfirmModal, DbContext). Ver `docs/testing.md`.
 - `src/components/Popup.jsx` usa `alert("Error saving")` para errores de guardado (el resto
   usa `react-toastify`).
 

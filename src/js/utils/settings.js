@@ -18,14 +18,15 @@ const isValidThreshold = (value) =>
 // Migra el umbral antiguo (semanas) al nuevo (días) si existe.
 const migrateLegacyThreshold = () => {
   try {
-    const legacy = Number(localStorage.getItem(LEGACY_THRESHOLD_KEY));
-    if (Number.isFinite(legacy)) {
-      const map = { 2: 14, 4: 30, 26: 180, 52: 365 };
-      const migrated = map[legacy] ?? DEFAULT_STALE_THRESHOLD;
-      localStorage.setItem(STALE_THRESHOLD_KEY, String(migrated));
-      localStorage.removeItem(LEGACY_THRESHOLD_KEY);
-      return migrated;
-    }
+    const legacyRaw = localStorage.getItem(LEGACY_THRESHOLD_KEY);
+    if (legacyRaw === null || legacyRaw === "") return null;
+    const legacy = Number(legacyRaw);
+    if (!Number.isFinite(legacy)) return null;
+    const map = { 2: 14, 4: 30, 26: 180, 52: 365 };
+    const migrated = map[legacy] ?? DEFAULT_STALE_THRESHOLD;
+    localStorage.setItem(STALE_THRESHOLD_KEY, String(migrated));
+    localStorage.removeItem(LEGACY_THRESHOLD_KEY);
+    return migrated;
   } catch {
     // localStorage no disponible
   }

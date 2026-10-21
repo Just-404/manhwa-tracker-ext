@@ -66,9 +66,9 @@ usuario; si no existe, lo crea.
 | `updateMahwa(id, newInfo)` | Actualiza campos de un manhwa (nota: el nombre de la función está escrito así en el código). |
 | `updateSite(id, newInfo)` | Actualiza campos de un site. |
 | `updateFavorite(idManhwa, fav)` | Fija `isFavorite` a `1`/`0`. |
-| `deleteManhwa(id)` | Borra el manhwa. **No** borra el `site` si queda huérfano. |
+| `deleteManhwa(id)` | Borra el manhwa y, si el `site` asociado queda sin manhwas referenciados, elimina también el `site` (limpieza de huérfanos). |
 | `exportDataBase()` | Ver formato de export. |
-| `importDatabase(file)` | Ver formato de export. |
+| `importDatabase(file)` | Valida la estructura del JSON (`manhwas` y `sites` como arrays). Ejecuta `clear()` + `bulkAdd()` **dentro de una transacción** para atomicidad; si falla, no deja datos parciales. |
 
 ## Formato de export / import (JSON)
 
@@ -91,10 +91,10 @@ usuario; si no existe, lo crea.
 ## Hechos conocidos (estado actual)
 
 - `metadata.dbversion` se toma de `db.verno` (versión real de la base; actualmente `1`).
-- El import **no valida** el contenido y hace `clear()` + `bulkAdd()` por tabla **sin
-  transacción**; si falla a mitad puede dejar datos parciales o vacíos.
+- El import **valida** la estructura y ejecuta `clear()` + `bulkAdd()` **en transacción**; ya no deja datos parciales.
 - La búsqueda no usa índices (carga toda la tabla en memoria).
-- No hay migraciones/versiones adicionales ni borrado de `site` huérfanos.
+- `deleteManhwa` limpia `site` huérfanos automáticamente.
+- El enum `ManhwaStatus` incluye `NOT_YET_RELEASED` y `DISCONTINUED` (valores de AniList).
 
 ## PENDIENTE DE CONFIRMAR
 

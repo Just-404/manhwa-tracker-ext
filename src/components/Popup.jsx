@@ -26,31 +26,34 @@ const Popup = () => {
       delete document.documentElement.dataset.mobile;
     }
 
-    chrome.tabs?.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        const tabId = tabs[0].id;
+    const runtime = browser.runtime || chrome.runtime;
+    const tabs = browser.tabs || chrome.tabs;
 
-        chrome.tabs.executeScript(tabId, { file: "contentScript.js" }, () => {
-          if (chrome.runtime.lastError) {
+    tabs?.query({ active: true, currentWindow: true }, (tabsArray) => {
+      if (tabsArray[0]?.id) {
+        const tabId = tabsArray[0].id;
+
+        tabs.executeScript(tabId, { file: "contentScript.js" }, () => {
+          if (runtime.lastError) {
             console.log(
               "Error injecting content script:",
-              chrome.runtime.lastError.message
+              runtime.lastError.message
             );
             setIsExtracting(false);
             return;
           }
 
           const ask = (attempt = 0) => {
-            chrome.tabs.sendMessage(
+            tabs.sendMessage(
               tabId,
               { action: "extractInfo" },
               (response) => {
-                if (chrome.runtime.lastError) {
+                if (runtime.lastError) {
                   if (attempt < 5) {
                     setTimeout(() => ask(attempt + 1), 150);
                     return;
                   }
-                  console.log("Error:", chrome.runtime.lastError.message);
+                  console.log("Error:", runtime.lastError.message);
                   setIsExtracting(false);
                   return;
                 }
@@ -87,6 +90,8 @@ const Popup = () => {
           imgUrl: media.coverImage.large,
           status: media.status || prev.status,
         }));
+      } else if (response?.error) {
+        addToastMessage("error", `AniList: ${response.error}`);
       } else {
         console.warn("Anilist fetch failed or returned no data");
       }
@@ -140,10 +145,11 @@ const Popup = () => {
   };
 
   const openLibraryTab = () => {
-    const tabs = window.browser?.tabs || window.chrome?.tabs;
+    const runtime = browser.runtime || chrome.runtime;
+    const tabs = browser.tabs || chrome.tabs;
 
     tabs.create({
-      url: (window.browser || window.chrome).runtime.getURL("library.html"),
+      url: runtime.getURL("library.html"),
     });
 
     const isFirefoxMobile = /Fennec|Android.*Firefox/.test(navigator.userAgent);

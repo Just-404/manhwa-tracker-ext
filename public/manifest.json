@@ -25,8 +25,6 @@
     "persistent": true
   },
 
-  "web_accessible_resources": ["library.html"],
-
-  "permissions": ["activeTab", "tabs", "https://graphql.anilist.co/"],
+  "permissions": ["activeTab", "https://graphql.anilist.co/"],
   "content_security_policy": "script-src 'self'; object-src 'self'; connect-src https://graphql.anilist.co"
 }

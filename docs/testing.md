@@ -16,8 +16,9 @@ Estado real de las comprobaciones del proyecto. **No se describen pruebas que no
 | --- | --- | --- |
 | `npm run dev` | Servidor de desarrollo Vite. | Definido. No verificado en navegador aquí. |
 | `npm run build` | Build de producción en `dist/`. | Definido. |
-| `npm run lint` | `eslint .` (ESLint 9, flat config `eslint.config.js`). | **Falla actualmente** (ver abajo). |
+| `npm run lint` | `eslint .` (ESLint 9, flat config `eslint.config.js`). | 0 errores / 3 warnings. |
 | `npm run preview` | Vista previa del build de Vite. | Definido. |
+| `npm test` | Tests unitarios con Vitest (lógica pura: settings, utils). | 28 tests pasando. |
 
 > `npm install` es necesario antes de build/lint (dependencias en `package.json`).
 
@@ -26,18 +27,18 @@ Estado real de las comprobaciones del proyecto. **No se describen pruebas que no
 Ejecutado con `npm run lint` / `npx eslint .`:
 
 ```
-✖ 4 problems (0 errors, 4 warnings)
+✖ 3 problems (0 errors, 3 warnings)
 ```
 
-Código de salida 0 (sin errores). **4 warnings** pendientes:
+Código de salida 0 (sin errores). **3 warnings** pendientes:
 
 - `src/components/ConfirmModal.jsx` — `react-refresh/only-export-components` (×2).
 - `src/db/DbContext.jsx` — `react-refresh/only-export-components`.
-- `src/components/Library.jsx` — `react-hooks/exhaustive-deps` en el `useEffect`.
 
 > Los 13 errores `no-undef` previos (`chrome`/`browser` sin declarar) se resolvieron
 > declarando los globales del entorno WebExtension (`globals.webextensions`). **No se
 > desactivó ninguna regla.**
+> El warning `react-hooks/exhaustive-deps` en `Library.jsx` se resolvió al estabilizar las dependencias del `useEffect`.
 
 ## Configuración de lint
 
