@@ -4,6 +4,7 @@ import styles from "../css/library.module.css";
 import ComicsContainer from "./ComicsContainer";
 import SidebarMenu from "./SidebarMenu";
 import FavoritesCarousel from "./FavoritesCarousel";
+import StaleCarousel from "./StaleCarousel";
 import StatsModal from "./StatsModal";
 import { useDexie } from "../db/useDexie";
 import addToastMessage from "../js/utils/toastify";
@@ -321,7 +322,12 @@ const Library = () => {
 
         <main className={styles.libraryMain}>
           {!activeSearchTerm && !favoriteSelected && (
-            <FavoritesCarousel refreshKey={refreshKey} />
+            <>
+              {(stats?.total ?? 0) > 0 && (
+                <StaleCarousel refreshKey={refreshKey} />
+              )}
+              <FavoritesCarousel refreshKey={refreshKey} />
+            </>
           )}
 
           <div className={styles.filterDiv}>

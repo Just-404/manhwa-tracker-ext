@@ -56,6 +56,23 @@ Para probar la extensión hay que construir y cargarla como extensión temporal 
 (no hay script que lo automatice). **PENDIENTE DE CONFIRMAR:** pasos exactos y soporte en
 Firefox móvil no verificados en el repositorio.
 
+### Filtro "Unread for" (carrusel Continue reading)
+
+1. Crear/importar registros con `lastTimeRead` en los siguientes rangos:
+   - ~10 días (debe aparecer solo en "2 weeks – 1 month")
+   - ~20 días (debe aparecer solo en "2 weeks – 1 month")
+   - ~2 meses / ~60 días (debe aparecer solo en "1 – 6 months")
+   - ~8 meses / ~240 días (debe aparecer solo en "6 months – 1 year")
+   - ~2 años / ~730 días (debe aparecer solo en "1+ year")
+2. Cambiar el desplegable y comprobar que **cada opción muestra solo su tramo**:
+   - "2 weeks – 1 month" → solo los de 14–29 días
+   - "1 – 6 months" → solo los de 30–179 días
+   - "6 months – 1 year" → solo los de 180–364 días
+   - "1+ year" → solo los de 365+ días
+3. Verificar que el contador del header (`count={total}`) refleja el total del tramo activo.
+4. Recargar la extensión y confirmar que la preferencia seleccionada se conserva
+   (migración de `staleThresholdWeeks` a `staleThresholdDays`).
+
 ## Recomendación de uso al hacer cambios
 
 1. Ejecutar `npm run lint` y comprobar que sigue en 0 errores (estado base: 0 errores /

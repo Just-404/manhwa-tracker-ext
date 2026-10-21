@@ -3,10 +3,17 @@ import {
   extractChapterFromUrl,
   getDomainName,
 } from "./utils/utils";
+
 if (!window.__MY_CONTENT_SCRIPT_INJECTED__) {
   window.__MY_CONTENT_SCRIPT_INJECTED__ = true;
+}
 
-  const runtime = browser.runtime || chrome.runtime;
+const runtime = browser.runtime || chrome.runtime;
+
+// Siempre registrar el listener para responder al popup, aunque el script
+// ya se haya inyectado anteriormente en esta pestaña.
+if (!window.__MY_CONTENT_SCRIPT_LISTENER__) {
+  window.__MY_CONTENT_SCRIPT_LISTENER__ = true;
 
   runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.action === "extractInfo") {
@@ -59,3 +66,4 @@ if (!window.__MY_CONTENT_SCRIPT_INJECTED__) {
     }
   });
 }
+

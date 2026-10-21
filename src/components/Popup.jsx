@@ -19,6 +19,13 @@ const Popup = () => {
   const { addManhwaWithSite } = useDexie();
 
   useEffect(() => {
+    const isFirefoxMobile = /Fennec|Android.*Firefox/.test(navigator.userAgent);
+    if (isFirefoxMobile) {
+      document.documentElement.dataset.mobile = "true";
+    } else {
+      delete document.documentElement.dataset.mobile;
+    }
+
     chrome.tabs?.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
         const tabId = tabs[0].id;
@@ -32,19 +39,31 @@ const Popup = () => {
             setIsExtracting(false);
             return;
           }
-          chrome.tabs.sendMessage(
-            tabs[0].id,
-            { action: "extractInfo" },
-            (response) => {
-              setIsExtracting(false);
-              if (chrome.runtime.lastError) {
-                console.log("Error:", chrome.runtime.lastError.message);
-              } else if (response) {
-                setSite(response.site);
-                setManhwa(response.manhwa);
+
+          const ask = (attempt = 0) => {
+            chrome.tabs.sendMessage(
+              tabId,
+              { action: "extractInfo" },
+              (response) => {
+                if (chrome.runtime.lastError) {
+                  if (attempt < 5) {
+                    setTimeout(() => ask(attempt + 1), 150);
+                    return;
+                  }
+                  console.log("Error:", chrome.runtime.lastError.message);
+                  setIsExtracting(false);
+                  return;
+                }
+                setIsExtracting(false);
+                if (response) {
+                  setSite(response.site);
+                  setManhwa(response.manhwa);
+                }
               }
-            }
-          );
+            );
+          };
+
+          ask();
         });
       } else {
         setIsExtracting(false);
@@ -130,7 +149,10 @@ const Popup = () => {
     const isFirefoxMobile = /Fennec|Android.*Firefox/.test(navigator.userAgent);
 
     if (isFirefoxMobile) {
+      document.documentElement.dataset.mobile = "true";
       window.close();
+    } else {
+      delete document.documentElement.dataset.mobile;
     }
   };
 

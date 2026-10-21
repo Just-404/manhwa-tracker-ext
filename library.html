@@ -2,12 +2,49 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/public//icons/icon16.png" />
+    <link rel="icon" type="image/png" href="/icons/icon16.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Manhwas</title>
+    <!--
+      Estilos críticos de arranque, equivalentes a los del popup: evitan el
+      destello de contenido sin estilo mientras React monta.
+    -->
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #131a2a;
+        color: #e8edfa;
+        color-scheme: dark;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      .boot {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        min-height: 100vh;
+        color: #97a5c6;
+        font-size: 0.9rem;
+      }
+      .boot::before {
+        content: "";
+        width: 16px;
+        height: 16px;
+        border: 2px solid #33436a;
+        border-top-color: #4f7cff;
+        border-radius: 50%;
+        animation: boot-spin 0.8s linear infinite;
+      }
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="boot">Loading…</div></div>
     <div id="modal-root"></div>
     <script type="module" src="/src/mainLibrary.jsx"></script>
   </body>

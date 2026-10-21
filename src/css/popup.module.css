@@ -1,5 +1,5 @@
 .popup {
-  width: min(380px, 100vw);
+  width: var(--popup-width, 380px);
 }
 
 /* ── Header ─────────────────────────────────────────────── */

@@ -1,4 +1,4 @@
-.favoritesSection {
+.section {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
@@ -21,8 +21,8 @@
   letter-spacing: -0.01em;
 }
 
-.sectionTitle svg {
-  color: var(--favorite);
+.titleIcon {
+  display: inline-flex;
 }
 
 .sectionCount {
@@ -33,6 +33,18 @@
   border-radius: 999px;
   padding: 0.1rem 0.55rem;
   font-variant-numeric: tabular-nums;
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.sectionControls {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 1.25rem;
 }
 
 .navButtons {
@@ -143,6 +155,7 @@
 }
 
 .coverLink {
+  position: relative;
   display: block;
   border-radius: 12px;
   overflow: hidden;

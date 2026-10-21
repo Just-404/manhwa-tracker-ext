@@ -22,7 +22,8 @@ Ambas interfaces comparten la misma base de datos `ManhwaDB`.
 manhwa-tracker-ext/
 ├─ index.html              # popup (browser_action.default_popup)
 ├─ library.html            # biblioteca (abierta en pestaña)
-├─ vite.config.js          # build con varias entradas
+├─ vite.config.js          # build principal (popup, biblioteca, background)
+├─ vite.content.config.js  # build del content script (archivo único, IIFE)
 ├─ eslint.config.js        # flat config de ESLint
 ├─ public/
 │  ├─ manifest.json        # Manifest V2 (se copia a dist/)
@@ -39,21 +40,35 @@ manhwa-tracker-ext/
 
 ## Entradas del build
 
-Definidas en `vite.config.js` (`build.rollupOptions.input`):
+Hay **dos builds** encadenados por `npm run build`:
 
-- `popup` → `index.html`
-- `library` → `library.html`
-- `background` → `src/js/background.js`
-- `contentScript` → `src/js/contentScript.js`
+- **Build principal** (`vite.config.js`, `build.rollupOptions.input`):
+  - `popup` → `index.html`
+  - `library` → `library.html`
+  - `background` → `src/js/background.js`
+- **Build del content script** (`vite.content.config.js`):
+  - `contentScript` → `src/js/contentScript.js`
 
 `background.js` y `contentScript.js` se emiten en la raíz de `dist/` (nombres sin hash,
 necesarios para el manifiesto); el resto se emite en `dist/assets/`.
 
+El build principal incluye el plugin `inline-entry-css` (`vite.config.js`), que
+reemplaza los `<link rel="stylesheet">` de cada HTML por su contenido en un `<style>`
+dentro del `<head>`. De este modo el CSS queda disponible antes de que el `<script
+type="module">` monte React, evitando el aviso de Gecko "Layout was forced before the
+page was fully loaded" y el destello de contenido sin estilo en el popup. Los `.css`
+de `dist/assets/` siguen emitiéndose pero ya no se referencian.
+
 ## Puntos de entrada de la UI
 
-- `src/mainPopup.jsx`: `createRoot(...).render(<StrictMode><DbProvider><Popup/></DbProvider></StrictMode>)`
-  e importa `src/css/general.css`.
-- `src/mainLibrary.jsx`: igual pero con `<Library/>`.
+- `src/mainPopup.jsx` / `src/mainLibrary.jsx`: montan React en `DOMContentLoaded` (o
+  `requestAnimationFrame` si ya está listo), dentro de `flushSync`. Con CSS inlineado
+  se evitan las lecturas de layout durante la carga inicial; el placeholder
+  `<div class="boot">Loading…</div>` mantiene el panel visible. Esto evita que el
+  popup se quede en blanco en Firefox.
+- `index.html` y `library.html` incluyen un CSS crítico mínimo y un placeholder
+  `<div class="boot">Loading…</div>` dentro de `#root`, que React reemplaza al montar.
+  Así el popup nunca se muestra vacío mientras se cargan los estilos/JS.
 
 ## Responsabilidad por módulo
 
@@ -74,7 +89,8 @@ necesarios para el manifiesto); el resto se emite en `dist/assets/`.
 | Módulo | Responsabilidad |
 | --- | --- |
 | `db/DbContext.jsx` | Crea `new Dexie("ManhwaDB")`, define `version(1)` con las tablas `site` y `manhwa`, y expone la instancia por React Context (`DbProvider`/`useDb`). |
-| `db/useDexie.js` | Hook con toda la lógica de datos: `addManhwaWithSite`, `getManhwas`, `searchByName`, `getFavoriteManhwas`, `updateMahwa`, `updateFavorite`, `updateSite`, `deleteManhwa`, `importDatabase`, `exportDataBase`. |
+| `db/useDexie.js` | Hook con toda la lógica de datos: `addManhwaWithSite`, `getManhwas`, `searchByName`, `getFavoriteManhwas`, `getStaleManhwas`, `getLibraryStats`, `updateMahwa`, `updateFavorite`, `updateSite`, `deleteManhwa`, `importDatabase`, `exportDataBase`. |
+| `js/utils/settings.js` | Umbrales del filtro "Unread for" (tramos por días), persistencia en `localStorage`, migración desde la clave antigua, y helper `getStaleWindow` para traducir la opción a su ventana `[minDays, maxDays)`. |
 
 Ver el modelo de datos en [`data-model.md`](data-model.md).
 
@@ -137,9 +153,15 @@ Patrón de acceso a APIs: `browser.runtime || chrome.runtime`. `Popup.jsx` tambi
 
 ## Empaquetado de los scripts de extensión
 
-El build inlinea las utilidades dentro de cada bundle de extensión: `dist/contentScript.js`
-y `dist/background.js` no importan módulos en tiempo de ejecución (contenido aplanado).
-`contentScript.js` importa `js/utils/utils.js`, que queda incluido en el bundle final.
+El `contentScript.js` se inyecta con `tabs.executeScript`, que lo ejecuta como **script
+clásico** (no como módulo ES). Por eso se compila en un **build separado**
+(`vite.content.config.js`) con formato **IIFE** y una sola entrada: así Vite no genera
+chunks compartidos y todas las dependencias (incluido `js/utils/utils.js`) quedan inline en
+un único `dist/contentScript.js`, sin `import`/`export`. Por el mismo motivo `contentScript`
+no participa del build principal: si compartiera build con la app, Vite lo partiría en
+chunks (`assets/utils-*.js`) y conservaría un `import`.
+
+`dist/background.js` tampoco importa módulos en tiempo de ejecución (contenido aplanado).
 
 ## PENDIENTE DE CONFIRMAR
 

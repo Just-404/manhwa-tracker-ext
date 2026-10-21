@@ -1,6 +1,7 @@
 import { useDb } from "./DbContext";
 import { useMemo } from "react";
 import ManhwaStatus from "../js/utils/enums";
+import { getStaleWindow } from "../js/utils/settings";
 
 export const useDexie = () => {
   const db = useDb();
@@ -128,6 +129,55 @@ export const useDexie = () => {
       );
       return { manhwasAndSite, total: count };
     };
+
+    // Heurística temporal: manhwas que no se leen desde hace al menos
+    // `thresholdDays` días. Se ordenan del más antiguo al más reciente.
+    // El parámetro thresholdDays se traduce a una ventana [minDays, maxDays)
+    // usando getStaleWindow, de modo que cada opción del selector
+    // muestra solo su tramo correspondiente.
+    const getStaleManhwas = async (page = 1, pageSize = 12, thresholdDays = 14) => {
+      if (!db || !db.manhwa) {
+        console.error("Database or manhwa table not initialized", db);
+        return { manhwasAndSite: [], total: 0 };
+      }
+
+      const { minDays, maxDays } = getStaleWindow(thresholdDays);
+      const DAY_MS = 24 * 60 * 60 * 1000;
+      const now = Date.now();
+
+      const minCutoff = now - minDays * DAY_MS;           // inclusive lower bound
+      const maxCutoff = maxDays === null ? null : now - maxDays * DAY_MS; // exclusive upper bound
+
+      const allManhwas = await db.manhwa.toArray();
+
+      const stale = allManhwas
+        .filter((manhwa) => {
+          if (!manhwa.lastTimeRead) return false;
+          const lastRead = new Date(manhwa.lastTimeRead).getTime();
+          if (Number.isNaN(lastRead)) return false;
+          // Incluye si: más viejo que minCutoff (>= minDays) Y (sin tope O más reciente que maxCutoff)
+          return lastRead <= minCutoff && (maxCutoff === null || lastRead > maxCutoff);
+        })
+        .sort(
+          (a, b) =>
+            new Date(a.lastTimeRead).getTime() -
+            new Date(b.lastTimeRead).getTime()
+        );
+
+      const total = stale.length;
+      const start = (page - 1) * pageSize;
+      const paginated = stale.slice(start, start + pageSize);
+
+      const manhwasAndSite = await Promise.all(
+        paginated.map(async (manhwa) => {
+          const site = await db.site.get(manhwa.idSite);
+          return { manhwa, site };
+        })
+      );
+
+      return { manhwasAndSite, total };
+    };
+
     const searchByName = async (name, page = 1, pageSize = 20) => {
       if (name === "") {
         throw new Error("The search term is empty");
@@ -246,6 +296,7 @@ export const useDexie = () => {
       getManhwas,
       searchByName,
       getFavoriteManhwas,
+      getStaleManhwas,
       getLibraryStats,
       updateMahwa,
       updateFavorite,
