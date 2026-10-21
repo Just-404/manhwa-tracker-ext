@@ -25,6 +25,6 @@
     "persistent": true
   },
 
-  "permissions": ["activeTab", "https://graphql.anilist.co/"],
-  "content_security_policy": "script-src 'self'; object-src 'self'; connect-src https://graphql.anilist.co"
+  "permissions": ["activeTab", "tabs", "https://graphql.anilist.co/", "https://api.mangadex.org/", "https://uploads.mangadex.org/"],
+  "content_security_policy": "script-src 'self'; object-src 'self'; connect-src https://graphql.anilist.co https://api.mangadex.org https://uploads.mangadex.org"
 }

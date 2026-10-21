@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useProxiedImage } from "../js/hooks/useProxiedImage";
 import CarouselBase from "./CarouselBase";
 import styles from "../css/carousel.module.css";
 import staleStyles from "../css/staleCarousel.module.css";
@@ -31,6 +32,54 @@ const ClockIcon = () => (
     <path d="M12 7v5l3 2" />
   </svg>
 );
+
+const StaleItem = ({ manhwa, site }) => {
+  const href = manhwa.currentChapterUrl || `https://${site?.baseUrl}`;
+  const { src: proxiedCover, error: coverError } = useProxiedImage(manhwa.imgUrl);
+
+  const placeholderSvg = `data:image/svg+xml,${encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 3" width="100%" height="100%" preserveAspectRatio="none">
+      <rect width="2" height="3" fill="var(--surface-2)"/>
+      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" 
+            font-family="system-ui, sans-serif" font-size="0.15" fill="var(--text-faint)">
+        Sin portada
+      </text>
+    </svg>
+  `)}`;
+  return (
+    <article className={styles.item}>
+      <a
+        className={styles.coverLink}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={manhwa.title}
+      >
+        <img
+          src={coverError ? placeholderSvg : (proxiedCover ?? placeholderSvg)}
+          alt={`${manhwa.title} cover`}
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+        />
+        <span className={staleStyles.badge}>
+          {formatTimeAgo(manhwa.lastTimeRead)}
+        </span>
+      </a>
+      <p className={styles.itemTitle}>{manhwa.title}</p>
+      <p className={styles.itemMeta}>
+        <span
+          className={styles.statusDot}
+          style={{ backgroundColor: statusColor(manhwa.status) }}
+          aria-hidden="true"
+        />
+        <span>
+          {manhwa.lastReadChapter}/{manhwa.chapters ?? "—"}
+        </span>
+      </p>
+    </article>
+  );
+};
 
 const StaleCarousel = ({ refreshKey }) => {
   const { getStaleManhwas } = useDexie();
@@ -75,43 +124,6 @@ const StaleCarousel = ({ refreshKey }) => {
     setThreshold(nextThreshold);
     setPage(1);
   };
-
-  const renderStale = useCallback(({ manhwa, site }) => {
-    const href = manhwa.currentChapterUrl || `https://${site?.baseUrl}`;
-    return (
-      <article className={styles.item}>
-        <a
-          className={styles.coverLink}
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          title={manhwa.title}
-        >
-          <img
-            src={manhwa.imgUrl || "../../icons/icon48.png"}
-            alt={`${manhwa.title} cover`}
-            loading="lazy"
-            decoding="async"
-            draggable={false}
-          />
-          <span className={staleStyles.badge}>
-            {formatTimeAgo(manhwa.lastTimeRead)}
-          </span>
-        </a>
-        <p className={styles.itemTitle}>{manhwa.title}</p>
-        <p className={styles.itemMeta}>
-          <span
-            className={styles.statusDot}
-            style={{ backgroundColor: statusColor(manhwa.status) }}
-            aria-hidden="true"
-          />
-          <span>
-            {manhwa.lastReadChapter}/{manhwa.chapters ?? "—"}
-          </span>
-        </p>
-      </article>
-    );
-  }, []);
 
   const thresholdControl = (
     <label className={staleStyles.thresholdControl}>
@@ -158,7 +170,7 @@ const StaleCarousel = ({ refreshKey }) => {
       icon={<ClockIcon />}
       count={total}
       items={items}
-      renderItem={renderStale}
+      renderItem={(item) => <StaleItem manhwa={item.manhwa} site={item.site} />}
       itemKey={({ manhwa }) => manhwa.idManhwa}
       page={page}
       pageCount={pageCount}

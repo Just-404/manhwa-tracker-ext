@@ -28,6 +28,7 @@
 .cardHeader .comicTitle a {
   display: block;
   line-height: 0;
+  width: 100%;
 }
 
 .cardHeader .comicTitle img {
