@@ -1,3 +1,5 @@
+import { parseJsonResponse } from "./httpUtils.js";
+
 const anilistCache = new Map();
 const CACHE_TTL = 10 * 60 * 1000;
 
@@ -34,7 +36,12 @@ export const fetchAniList = async (title) => {
       }),
     });
 
-    const json = await response.json();
+    const parsed = await parseJsonResponse(response);
+    if (!parsed.ok) {
+      console.error("AniList fetch failed:", parsed.error);
+      return { ok: false, error: parsed.error };
+    }
+    const json = parsed.json;
 
     if (json.errors) {
       console.error("AniList GraphQL errors:", json.errors);
@@ -48,7 +55,7 @@ export const fetchAniList = async (title) => {
     const data = {
       chapters: json.data.Media.chapters,
       genres: json.data.Media.genres,
-      coverImage: { large: json.data.Media.coverImage.large },
+      coverImage: { large: json.data.Media.coverImage?.large ?? null },
       status: json.data.Media.status,
     };
 

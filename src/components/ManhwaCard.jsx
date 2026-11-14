@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProxiedImage } from "../js/hooks/useProxiedImage";
+import CoverImage from "./CoverImage";
 import styles from "../css/manhwaCard.module.css";
 import ManhwaStatus from "../js/utils/enums";
 import EditModal from "./EditModal";
@@ -15,18 +15,6 @@ const ManhwaCard = ({
 }) => {
   const [isFavorite, setIsFavorite] = useState(manhwa.isFavorite);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { src: proxiedCover, loading: coverLoading, error: coverError } = useProxiedImage(manhwa.imgUrl);
-
-  // Placeholder SVG 2:3 que encaja perfecto en el card sin pixelarse
-  const placeholderSvg = `data:image/svg+xml,${encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 3" width="100%" height="100%" preserveAspectRatio="none">
-      <rect width="2" height="3" fill="var(--surface-2)"/>
-      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" 
-            font-family="system-ui, sans-serif" font-size="0.15" fill="var(--text-faint)">
-        Sin portada
-      </text>
-    </svg>
-  `)}`;
 
   const toggleFavorite = () => {
     setIsFavorite(!isFavorite);
@@ -48,12 +36,9 @@ const ManhwaCard = ({
               target="_blank"
               rel="noopener noreferrer"
             >
-              <img
-                src={coverError ? placeholderSvg : (proxiedCover ?? placeholderSvg)}
+              <CoverImage
+                src={manhwa.imgUrl}
                 alt={`${manhwa.title} front page`}
-                loading="lazy"
-                decoding="async"
-                style={coverLoading ? { opacity: 0.5 } : undefined}
               />
             </a>
             <h3>

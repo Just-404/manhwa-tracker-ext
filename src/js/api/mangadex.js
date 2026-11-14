@@ -2,6 +2,8 @@
 // Maps MangaDex response to the same contract AniList uses:
 // { chapters, genres, coverImage: { large }, status }
 
+import { parseJsonResponse } from "./httpUtils.js";
+
 const mangadexCache = new Map();
 const CACHE_TTL = 10 * 60 * 1000;
 
@@ -90,7 +92,9 @@ const fetchAggregate = async (mangaId) => {
     const res = await fetch(`${MANGADEX_API}/manga/${mangaId}/aggregate`, {
       method: "GET",
     });
-    const json = await res.json();
+    const parsed = await parseJsonResponse(res);
+    if (!parsed.ok) return null;
+    const json = parsed.json;
     if (json.result === "ok" && json.chapters) {
       const volumes = Object.values(json.chapters);
       let total = 0;
@@ -120,7 +124,12 @@ export const fetchMangaDex = async (title) => {
     const searchRes = await fetch(
       `${MANGADEX_API}/manga?title=${encodeURIComponent(title)}&limit=5&includes[]=cover_art&includes[]=tags`
     );
-    const searchJson = await searchRes.json();
+    const parsed = await parseJsonResponse(searchRes);
+    if (!parsed.ok) {
+      console.error("MangaDex search failed:", parsed.error);
+      return { ok: false, error: parsed.error };
+    }
+    const searchJson = parsed.json;
 
     if (searchJson.result !== "ok" || !searchJson.data?.length) {
       return { ok: false, error: "No manga found on MangaDex" };

@@ -2,28 +2,13 @@ const runtime = browser.runtime || chrome.runtime;
 
 import { fetchAniList } from "./api/anilist.js";
 import { fetchMangaDex } from "./api/mangadex.js";
+import { createCircuitBreaker } from "./utils/circuitBreaker.js";
 
-// Circuit breaker state
-const circuitBreaker = {
-  anilistDown: false,
-  anilistDownUntil: 0,
-  ANILIST_COOLDOWN: 15 * 60 * 1000, // 15 min
-};
+// Circuit breaker: opens after 3 consecutive AniList failures, for 15 min.
+const breaker = createCircuitBreaker({ threshold: 3, cooldownMs: 15 * 60 * 1000 });
 
 const mainCache = new Map();
 const CACHE_TTL = 10 * 60 * 1000;
-
-const checkCircuitBreaker = () => {
-  const now = Date.now();
-  if (circuitBreaker.anilistDown && now >= circuitBreaker.anilistDownUntil) {
-    circuitBreaker.anilistDown = false;
-  }
-};
-
-const recordAniListFailure = () => {
-  circuitBreaker.anilistDown = true;
-  circuitBreaker.anilistDownUntil = Date.now() + circuitBreaker.ANILIST_COOLDOWN;
-};
 
 runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "fetchComicData") {
@@ -38,20 +23,28 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
     }
 
     const executeFetch = async () => {
-      checkCircuitBreaker();
+      const breakerWasOpen = breaker.isOpen();
 
       // Try AniList first (unless circuit breaker is open)
-      if (!circuitBreaker.anilistDown) {
+      let anilistError = null;
+      if (!breakerWasOpen) {
         const anilistResult = await fetchAniList(cleanedTitle);
         if (anilistResult.ok) {
+          breaker.recordSuccess();
           const response = { success: true, data: anilistResult.data, source: "anilist" };
           mainCache.set(cleanedTitle, { ts: now, value: response });
           sendResponse(response);
           return;
         }
         // AniList failed - record failure and fall through to MangaDex
-        console.warn("AniList failed, falling back to MangaDex:", anilistResult.error);
-        recordAniListFailure();
+        anilistError = anilistResult.error;
+        breaker.recordFailure();
+        console.warn(
+          breaker.isOpen()
+            ? "AniList failed repeatedly, circuit breaker opened. Falling back to MangaDex:"
+            : "AniList failed, falling back to MangaDex:",
+          anilistError
+        );
       } else {
         console.log("AniList circuit breaker open, skipping to MangaDex");
       }
@@ -66,9 +59,12 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
       }
 
       // Both failed
+      const anilistReason = breakerWasOpen
+        ? "circuit breaker open"
+        : anilistError || "failed";
       sendResponse({
         success: false,
-        error: `AniList: ${circuitBreaker.anilistDown ? "circuit breaker open" : "failed"}; MangaDex: ${mangadexResult.error}`,
+        error: `AniList: ${anilistReason}; MangaDex: ${mangadexResult.error}`,
       });
     };
 

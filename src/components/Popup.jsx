@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useProxiedImage } from "../js/hooks/useProxiedImage";
+import CoverImage from "./CoverImage";
 import { ToastContainer } from "react-toastify";
 import addToastMessage from "../js/utils/toastify";
 import confirmModal from "../js/utils/confirmModal";
@@ -18,17 +18,6 @@ const Popup = () => {
   const [isFetchingInfo, setIsFetchingInfo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { addManhwaWithSite } = useDexie();
-  const { src: proxiedCover, loading: coverLoading, error: coverError } = useProxiedImage(manhwa.imgUrl);
-
-  const placeholderSvg = `data:image/svg+xml,${encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 3" width="100%" height="100%" preserveAspectRatio="none">
-      <rect width="2" height="3" fill="var(--surface-2)"/>
-      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" 
-            font-family="system-ui, sans-serif" font-size="0.15" fill="var(--text-faint)">
-        Sin portada
-      </text>
-    </svg>
-  `)}`;
 
   useEffect(() => {
     const isFirefoxMobile = /Fennec|Android.*Firefox/.test(navigator.userAgent);
@@ -103,7 +92,7 @@ const Popup = () => {
           status: media.status || prev.status,
         }));
       } else if (response?.error) {
-        addToastMessage("error", `AniList: ${response.error}`);
+        addToastMessage("error", response.error);
       } else {
         console.warn("Anilist fetch failed or returned no data");
       }
@@ -254,7 +243,7 @@ const Popup = () => {
         <form className={styles.form} action="#" onSubmit={handleSubmit}>
           {manhwa.imgUrl && (
             <div className={styles.previewCard}>
-              <img src={coverError ? placeholderSvg : proxiedCover} alt={`${manhwa.title} cover`} style={coverLoading ? { opacity: 0.5 } : undefined} />
+              <CoverImage src={manhwa.imgUrl} alt={`${manhwa.title} cover`} />
               <div className={styles.previewInfo}>
                 <p className={styles.previewTitle}>{manhwa.title}</p>
                 <p className={styles.previewMeta}>

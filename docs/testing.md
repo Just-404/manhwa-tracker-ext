@@ -4,8 +4,24 @@ Estado real de las comprobaciones del proyecto. **No se describen pruebas que no
 
 ## Tests automatizados
 
-- **No hay tests.** No existe framework de pruebas, ni archivos `*.test.*`/`*.spec.*`, ni
-  script de test en `package.json`.
+- **Sí hay tests unitarios** con Vitest (`vitest.config.js`, entorno jsdom,
+  `globals: true`, setup en `src/test/setup.js`). Se ejecutan con `npm test`.
+  Cobertura actual (**67 tests pasando**):
+  - `src/js/utils/__tests__/utils.test.js` (19): `cleanTitle`, `extractChapterFromUrl`,
+    `getDomainName`, `formatTimeAgo`.
+  - `src/js/utils/__tests__/settings.test.js` (9): ventana "stale" y persistencia/migración
+    en localStorage.
+  - `src/js/utils/__tests__/circuitBreaker.test.js` (10): lógica del circuit breaker de
+    AniList (`src/js/utils/circuitBreaker.js`): umbral de fallos consecutivos (3), cooldown
+    de 15 min, half-open, rachas y fallas "stale".
+  - `src/js/api/__tests__/anilist.test.js` (7): `fetchAniList` con `fetch` mockeado
+    (respuesta OK, errores GraphQL, HTTP 502 con HTML, sin Media, sin `coverImage`, caché,
+    error de red).
+  - `src/js/api/__tests__/mangadex.test.js` (22): adaptador MangaDex con `fetch` mockeado
+    (`mapStatus`, `extractGenres`, `buildCoverUrl`, `scoreCandidate`/`pickBestCandidate`,
+    y `fetchMangaDex`: búsqueda OK, HTML/403/429, sin resultados, sin `cover_art`,
+    fallback al aggregate, caché).
+- **No hay tests de componentes React** (no está instalado `@testing-library/react`).
 - **No hay type-check:** el proyecto no usa TypeScript (no hay `tsconfig.json`) ni chequeo
   de tipos configurado.
 - **No hay CI:** no existe `.github/` ni otra configuración de integración continua.
@@ -18,7 +34,7 @@ Estado real de las comprobaciones del proyecto. **No se describen pruebas que no
 | `npm run build` | Build de producción en `dist/`. | Definido. |
 | `npm run lint` | `eslint .` (ESLint 9, flat config `eslint.config.js`). | 0 errores / 3 warnings. |
 | `npm run preview` | Vista previa del build de Vite. | Definido. |
-| `npm test` | Tests unitarios con Vitest (lógica pura: settings, utils). | 28 tests pasando. |
+| `npm test` | Tests unitarios con Vitest (lógica pura: utils, settings, circuit breaker, módulos API). | 67 tests pasando. |
 
 > `npm install` es necesario antes de build/lint (dependencias en `package.json`).
 
@@ -77,6 +93,6 @@ Firefox móvil no verificados en el repositorio.
 ## Recomendación de uso al hacer cambios
 
 1. Ejecutar `npm run lint` y comprobar que sigue en 0 errores (estado base: 0 errores /
-   4 warnings) para no introducir errores nuevos.
+   3 warnings) para no introducir errores nuevos.
 2. Ejecutar `npm run build` para confirmar que el empaquetado (`dist/`) se genera.
 3. Verificar manualmente en Firefox el flujo afectado (popup, biblioteca, guardado).

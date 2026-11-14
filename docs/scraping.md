@@ -59,14 +59,24 @@ objetos:
 - Divide por `.`; si hay ≤ 2 partes devuelve la primera; si empieza por `www` la elimina;
   devuelve el penúltimo segmento (el dominio de segundo nivel).
 
-## Metadatos desde AniList (`src/js/background.js`)
+## Metadatos desde AniList (`src/js/api/anilist.js`, orquestado por `src/js/background.js`)
 
 - Endpoint: `POST https://graphql.anilist.co`.
-- Query GraphQL (`Media(search: "<titulo>", type: MANGA)`) que pide: `chapters`, `genres`,
-  `coverImage { large }`, `status`.
-- El título se **interpola directamente** en el string de la query (no usa variables GraphQL
-  ni escapado). Ver notas abajo.
-- Respuesta esperada: `{ success: true, data: <Media> }` o `{ success: false, error }`.
+- Query GraphQL **con variables** (`Media(search: $search, type: MANGA)`) que pide:
+  `chapters`, `genres`, `coverImage { large }`, `status`.
+- Módulos API (`src/js/api/`):
+  - `anilist.js`: fuente primaria. Caché propia de 10 min. `parseJsonResponse`
+    (`httpUtils.js`) valida `response.ok` y Content-Type antes de `.json()`, para no
+    propagar errores crudos de `JSON.parse` cuando el servidor devuelve HTML.
+  - `mangadex.js`: fallback si AniList falla. Busca en `api.mangadex.org`, elige el mejor
+    candidato por similitud de título (`scoreCandidate`) y mapea a la misma forma de datos:
+    `{ chapters, genres, coverImage: { large }, status }`.
+  - `background.js`: orquesta ambas, con caché global de 10 min y un **circuit breaker**
+    (`src/js/utils/circuitBreaker.js`): se abre tras **3 fallos consecutivos** de AniList y
+    queda abierto **15 minutos** (después vuelve a intentar AniList). Si ambas fuentes
+    fallan responde `{ success: false, error: "AniList: <motivo>; MangaDex: <motivo>" }`.
+- Respuesta esperada: `{ success: true, data, source: "anilist" | "mangadex" }` o
+  `{ success: false, error }`.
 
 ## Sitios soportados
 
@@ -82,17 +92,23 @@ partir del código.
   igualmente con `site`/`manhwa` (parcialmente vacíos).
 - **Background:** `try/catch` con `.catch`; en error hace `console.error` y responde
   `{success:false}`.
+- **Módulos API:** ante respuesta no-JSON (HTML, cuerpo vacío, HTTP 4xx/5xx) devuelven
+  errores descriptivos (`HTTP 403`, `HTTP 429 (rate limited)`,
+  `Non-JSON response (content-type: ...)`) en lugar de crashear en `.json()`.
+- **Portadas:** el componente `CoverImage` (`src/components/CoverImage.jsx`) muestra un
+  placeholder "Sin portada" cuando `imgUrl` es `null`, cuando el proxy de MangaDex falla
+  o cuando el `<img>` dispara `onError` (evita tiles negros/rotos en biblioteca).
 - **Popup:** en la inyección/mensajería comprueba `chrome.runtime.lastError` y hace
   `console.log`; en el guardado usa `alert("Error saving")` y `console.log`.
 - **Utilidades:** `extractChapterFromUrl` devuelve `null` cuando no hay coincidencia.
 
 ## Observaciones (hechos del código, sin corregir)
 
-- La query de AniList se construye por **interpolación de string**; un título que contenga
-  comillas puede romper o alterar la query.
 - La extracción depende de la posición del título en el path y del regex de capítulo, por
   lo que en sitios con otras estructuras de URL el resultado puede ser incorrecto o `null`.
 - La llamada a AniList está **duplicada** (content script y popup).
+- MangaDex puede devolver `coverImage.large: null` (sin relación `cover_art`); ese registro
+  se guarda con portada vacía y la biblioteca muestra el placeholder.
 
 ## PENDIENTE DE CONFIRMAR
 

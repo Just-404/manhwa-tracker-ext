@@ -98,7 +98,7 @@ Ver el modelo de datos en [`data-model.md`](data-model.md).
 
 | Módulo | Responsabilidad |
 | --- | --- |
-| `js/background.js` | Escucha `{action:"fetchComicData"}` y consulta la API GraphQL de AniList. Devuelve `chapters`, `genres`, `coverImage.large`, `status`. |
+| `js/background.js` | Escucha `{action:"fetchComicData"}` y consulta AniList (fuente primaria, con circuit breaker: se abre tras 3 fallos consecutivos, 15 min de cooldown); si falla, hace fallback a MangaDex. Devuelve `chapters`, `genres`, `coverImage.large`, `status` y `source` (`anilist`/`mangadex`). |
 | `js/contentScript.js` | Escucha `{action:"extractInfo"}`. Construye `site` y `manhwa` desde la URL y delega los metadatos a background. Se protege contra doble inyección con `window.__MY_CONTENT_SCRIPT_INJECTED__`. |
 | `js/utils/utils.js` | `cleanTitle`, `extractChapterFromUrl`, `getDomainName`. |
 | `js/utils/enums.js` | `ManhwaStatus` (enum congelado). |
@@ -114,7 +114,7 @@ Ver estrategia de extracción en [`scraping.md`](scraping.md).
 3. `chrome.tabs.sendMessage(tabId, {action:"extractInfo"})`.
 4. El content script arma `site` y `manhwa` desde la URL (ver `scraping.md`).
 5. El content script envía `{action:"fetchComicData", title}` al background.
-6. El background consulta AniList y responde `{success, data}`.
+6. El background consulta AniList (fallback: MangaDex) y responde `{success, data, source}`.
 7. El content script completa `chapters/genre/imgUrl/status` y responde al popup con
    `{site, manhwa}`.
 8. El popup muestra el formulario; al enviar, `addManhwaWithSite(site, manhwa, cb)`:
