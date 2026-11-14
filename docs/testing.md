@@ -6,14 +6,18 @@ Estado real de las comprobaciones del proyecto. **No se describen pruebas que no
 
 - **Sí hay tests unitarios** con Vitest (`vitest.config.js`, entorno jsdom,
   `globals: true`, setup en `src/test/setup.js`). Se ejecutan con `npm test`.
-  Cobertura actual (**67 tests pasando**):
-  - `src/js/utils/__tests__/utils.test.js` (19): `cleanTitle`, `extractChapterFromUrl`,
+  Cobertura actual (**85 tests pasando**):
+  - `src/js/utils/__tests__/utils.test.js` (19): `cleanTitle` (incluido el modo
+    `stripHashSuffix=false` para slugs ya limpios), `extractChapterFromUrl`,
     `getDomainName`, `formatTimeAgo`.
   - `src/js/utils/__tests__/settings.test.js` (9): ventana "stale" y persistencia/migración
     en localStorage.
   - `src/js/utils/__tests__/circuitBreaker.test.js` (10): lógica del circuit breaker de
     AniList (`src/js/utils/circuitBreaker.js`): umbral de fallos consecutivos (3), cooldown
     de 15 min, half-open, rachas y fallas "stale".
+  - `src/js/utils/__tests__/sitePatterns.test.js` (17): registro de patrones por sitio
+    (`src/js/utils/sitePatterns.js`): las 8 URLs reales de referencia (título + capítulo),
+    fallback genérico, subdominios, prefijo de comix.to y capítulos fraccionarios.
   - `src/js/api/__tests__/anilist.test.js` (7): `fetchAniList` con `fetch` mockeado
     (respuesta OK, errores GraphQL, HTTP 502 con HTML, sin Media, sin `coverImage`, caché,
     error de red).
@@ -34,7 +38,7 @@ Estado real de las comprobaciones del proyecto. **No se describen pruebas que no
 | `npm run build` | Build de producción en `dist/`. | Definido. |
 | `npm run lint` | `eslint .` (ESLint 9, flat config `eslint.config.js`). | 0 errores / 3 warnings. |
 | `npm run preview` | Vista previa del build de Vite. | Definido. |
-| `npm test` | Tests unitarios con Vitest (lógica pura: utils, settings, circuit breaker, módulos API). | 67 tests pasando. |
+| `npm test` | Tests unitarios con Vitest (lógica pura: utils, settings, site patterns, circuit breaker, módulos API). | 85 tests pasando. |
 
 > `npm install` es necesario antes de build/lint (dependencias en `package.json`).
 

@@ -80,11 +80,28 @@ objetos:
 
 ## Sitios soportados
 
-**No hay una lista explícita de sitios.** No existen adaptadores, mapas de selectores ni
-configuración por dominio. El funcionamiento es implícito: sirve para páginas cuya URL
-encaje con las heurísticas anteriores (título en el `split("/")[2]` y capítulo detectable
-por el regex). **PENDIENTE DE CONFIRMAR:** no hay forma de enumerar sitios soportados a
-partir del código.
+Hay una **lista explícita de patrones** en `src/js/utils/sitePatterns.js`
+(`SITE_PATTERNS`, matcheada por host con `matchSitePattern(hostname, pathname)`):
+
+| Host(es) | Estructura de URL | Título | Capítulo |
+| --- | --- | --- | --- |
+| `comix.to` | `/title/<prefijo-aleatorio>-<slug>/<id>-chapter-<n>` | slug sin todo lo anterior al primer guion | n (acepta decimales) |
+| `asurascans.com` | `/comics/<slug>-<id-hex>/chapter/<n>` | slug sin el sufijo hex `-fXXXXXX` | n (acepta decimales) |
+| `roliascan.com` | `/read/<slug>/ch<n>-<id-numérico>` | slug | n (acepta decimales) |
+| `toongod.org`, `manhwatop.com`, `dragontea.ink`, `kunmanga.com`, `manhuatop.org` | `/{categoria}/{slug}/chapter-<n>/` | slug (se conservan sufijos del sitio como `-series-manhwa`) | n (acepta decimales) |
+
+- El sufijo hex de asurascans y el prefijo aleatorio de comix.to son **convenciones
+  confirmadas por el maintainer** (no verificables desde el código).
+- El contenido del slug registrado NO pasa por la heurística anti-hash de `cleanTitle`
+  (se llama con `stripHashSuffix = false`) para no perder la última palabra legítima.
+
+### Fallback genérico (sitios no registrados)
+
+Para cualquier otro sitio sigue la lógica previa de `src/js/utils/utils.js`:
+título en `pathname.split("/")[2]` (+ heurística anti-hash de `cleanTitle`) y capítulo
+con `extractChapterFromUrl` (`/chapter-<n>` o `/chapter/<n>`, con decimales).
+**PENDIENTE DE CONFIRMAR:** comportamiento frente a sitios no registrados no verificado
+en navegador.
 
 ## Manejo de errores
 

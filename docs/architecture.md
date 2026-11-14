@@ -99,7 +99,7 @@ Ver el modelo de datos en [`data-model.md`](data-model.md).
 | Módulo | Responsabilidad |
 | --- | --- |
 | `js/background.js` | Escucha `{action:"fetchComicData"}` y consulta AniList (fuente primaria, con circuit breaker: se abre tras 3 fallos consecutivos, 15 min de cooldown); si falla, hace fallback a MangaDex. Devuelve `chapters`, `genres`, `coverImage.large`, `status` y `source` (`anilist`/`mangadex`). |
-| `js/contentScript.js` | Escucha `{action:"extractInfo"}`. Construye `site` y `manhwa` desde la URL y delega los metadatos a background. Se protege contra doble inyección con `window.__MY_CONTENT_SCRIPT_INJECTED__`. |
+| `js/contentScript.js` | Escucha `{action:"extractInfo"}`. Extrae título y capítulo con los patrones por sitio (`js/utils/sitePatterns.js`) o, si el host no está registrado, con la heurística genérica de `js/utils/utils.js`. Construye `site` y `manhwa` desde la URL y delega los metadatos a background. Se protege contra doble inyección con `window.__MY_CONTENT_SCRIPT_INJECTED__`. |
 | `js/utils/utils.js` | `cleanTitle`, `extractChapterFromUrl`, `getDomainName`. |
 | `js/utils/enums.js` | `ManhwaStatus` (enum congelado). |
 | `js/utils/toastify.js` | `addToastMessage(type, msg, ...)`. |

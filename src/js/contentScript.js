@@ -3,6 +3,7 @@ import {
   extractChapterFromUrl,
   getDomainName,
 } from "./utils/utils";
+import { matchSitePattern } from "./utils/sitePatterns";
 
 if (!window.__MY_CONTENT_SCRIPT_INJECTED__) {
   window.__MY_CONTENT_SCRIPT_INJECTED__ = true;
@@ -19,8 +20,24 @@ if (!window.__MY_CONTENT_SCRIPT_LISTENER__) {
     if (msg.action === "extractInfo") {
       (async () => {
         const baseUrl = window.location.hostname;
-        const title = window.location.pathname.split("/")[2];
-        const cleanedTitle = decodeURIComponent(cleanTitle(title));
+
+        // Per-site patterns first; hosts not registered keep the generic logic
+        const siteMatch = matchSitePattern(
+          baseUrl,
+          window.location.pathname
+        );
+        const rawTitle = siteMatch
+          ? siteMatch.title
+          : window.location.pathname.split("/")[2];
+        const chapter = siteMatch
+          ? siteMatch.chapter
+          : extractChapterFromUrl(window.location.href);
+
+        // stripHashSuffix only for the generic fallback path: registered site
+        // slugs are already clean and must not lose their last word
+        const cleanedTitle = decodeURIComponent(
+          cleanTitle(rawTitle, !siteMatch)
+        );
 
         const site = {
           name: getDomainName(baseUrl),
@@ -35,7 +52,7 @@ if (!window.__MY_CONTENT_SCRIPT_LISTENER__) {
           title: cleanedTitle,
           chapters: null,
           currentChapterUrl: window.location.href,
-          lastReadChapter: extractChapterFromUrl(window.location.href),
+          lastReadChapter: chapter,
           isFavorite: 0,
           status: null,
           lastTimeRead: new Date().toISOString(),

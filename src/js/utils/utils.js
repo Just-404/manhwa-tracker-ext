@@ -1,9 +1,14 @@
-const cleanTitle = (title) => {
+// `stripHashSuffix` removes a trailing hash-like token (generic heuristic for
+// unregistered sites). Site patterns pass `false` because their slugs are
+// already clean and would lose legitimate final words (e.g. "Awakening").
+const cleanTitle = (title, stripHashSuffix = true) => {
   const parts = title.split("-");
-  const lastPart = parts[parts.length - 1];
+  if (stripHashSuffix) {
+    const lastPart = parts[parts.length - 1];
 
-  if (/^[a-z0-9]{6,}$/.test(lastPart)) {
-    parts.pop();
+    if (/^[a-z0-9]{6,}$/.test(lastPart)) {
+      parts.pop();
+    }
   }
 
   return parts
